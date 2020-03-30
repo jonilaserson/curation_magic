@@ -1,0 +1,19 @@
+query,min,max,index_ref
+"exists == ""1""",800.0,800.0,-1
+"is_pos == ""1""",0.5,0.5,0
+"is_pos == ""0""",0.5,0.5,0
+"data_source == ""optimam"" & is_pos == ""0""",0.4,0.6,2
+"data_source == ""imh"" & is_pos == ""0""",0.4,0.6,2
+"data_source == ""optimam"" & is_pos == ""1""",0.4,0.6,1
+"data_source == ""imh"" & is_pos == ""1""",0.4,0.6,1
+"lesion_type == ""mass"" & is_pos == ""1""",0.65,0.7,1
+"lesion_type == ""calcification"" & is_pos == ""1""",0.3,0.35,1
+"birad == ""1"" & is_pos == ""0""",0.75,0.8,2
+"birad == ""2"" & is_pos == ""0""",0.2,0.25,2
+"lesion_type == ""mass"" & largest_mass<=10",0.1,0.15,7
+"lesion_type == ""mass"" & largest_mass>10 & largest_mass<=20",0.5,0.6,7
+"lesion_type == ""mass"" & largest_mass>20 & largest_mass<=50",0.25,0.3,7
+age<50,0.25,0.3,0
+age<60 & age>=50,0.27,0.33,0
+age<70 & age>=60,0.22,0.26,0
+age>=70,0.15,0.2,0

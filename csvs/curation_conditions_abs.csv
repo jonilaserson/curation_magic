@@ -1,0 +1,18 @@
+query,min,max,index_ref
+"is_pos == ""1""",400,400,-1
+"is_pos == ""0""",400,400,-1
+"data_source == ""optimam"" & is_pos == ""0""",160,240,-1
+"data_source == ""imh"" & is_pos == ""0""",160,240,-1
+"data_source == ""optimam"" & is_pos == ""1""",160,240,-1
+"data_source == ""imh"" & is_pos == ""1""",160,240,-1
+"lesion_type == ""mass"" & is_pos == ""1""",270,300,-1
+"lesion_type == ""calcification"" & is_pos == ""1""",110,140,-1
+"birad == ""1"" & is_pos == ""0""",300,320,-1
+"birad == ""2"" & is_pos == ""0""",80,100,-1
+"lesion_type == ""mass"" & largest_mass<=10",30,40,-1
+"lesion_type == ""mass"" & largest_mass>10 & largest_mass<=20",140,180,-1
+"lesion_type == ""mass"" & largest_mass>20 & largest_mass<=50",75,110,-1
+age<50,200,240,-1
+age<60 & age>=50,216,264,-1
+age<70 & age>=60,176,208,-1
+age>=70,120,160,-1
