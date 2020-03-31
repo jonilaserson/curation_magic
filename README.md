@@ -30,6 +30,7 @@ df_samples.head(10)
 
 
 
+{% raw %}
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -183,6 +184,7 @@ df_samples.head(10)
   </tbody>
 </table>
 </div>
+{% endraw %}
 
 
 
@@ -198,6 +200,7 @@ df_cond_abs
 
 
 
+{% raw %}
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -333,6 +336,7 @@ df_cond_abs
   </tbody>
 </table>
 </div>
+{% endraw %}
 
 
 
@@ -358,6 +362,7 @@ summary
 
 
 
+{% raw %}
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -505,6 +510,7 @@ summary
   </tbody>
 </table>
 </div>
+{% endraw %}
 
 
 
@@ -520,6 +526,7 @@ df_samples.head()
 
 
 
+{% raw %}
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -625,6 +632,7 @@ df_samples.head()
   </tbody>
 </table>
 </div>
+{% endraw %}
 
 
 
@@ -646,6 +654,7 @@ df_cond_rel.reset_index()
 
 
 
+{% raw %}
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -800,6 +809,7 @@ df_cond_rel.reset_index()
   </tbody>
 </table>
 </div>
+{% endraw %}
 
 
 
@@ -824,6 +834,7 @@ summary
 
 
 
+{% raw %}
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
@@ -978,6 +989,7 @@ summary
   </tbody>
 </table>
 </div>
+{% endraw %}
 
 
 
