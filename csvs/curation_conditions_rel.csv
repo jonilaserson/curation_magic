@@ -1,7 +1,7 @@
 query,min,max,index_ref
 "exists == ""1""",800.0,800.0,-1
-"is_pos == ""1""",0.5,0.5,0
-"is_pos == ""0""",0.5,0.5,0
+"is_pos == ""1""",0.4,0.6,0
+"is_pos == ""0""",0.4,0.6,0
 "data_source == ""optimam"" & is_pos == ""0""",0.4,0.6,2
 "data_source == ""imh"" & is_pos == ""0""",0.4,0.6,2
 "data_source == ""optimam"" & is_pos == ""1""",0.4,0.6,1

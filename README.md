@@ -24,7 +24,7 @@ import pandas as pd
 df_samples = pd.read_csv('csvs/curation_pool.csv', 
                          converters={'age':int, 'birad':int})
 df_samples = df_samples.set_index('study_id')
-df_samples.head(10)
+df_samples.sample(7)
 ```
 
 
@@ -71,113 +71,80 @@ df_samples.head(10)
   </thead>
   <tbody>
     <tr>
-      <th>0</th>
+      <th>219</th>
+      <td>1</td>
+      <td>optimam</td>
+      <td>60</td>
+      <td>4</td>
+      <td>0</td>
+      <td>calcification</td>
+      <td>NaN</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>910</th>
+      <td>1</td>
+      <td>optimam</td>
+      <td>44</td>
+      <td>3</td>
+      <td>0</td>
+      <td>calcification</td>
+      <td>NaN</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>499</th>
+      <td>1</td>
+      <td>optimam</td>
+      <td>57</td>
+      <td>4</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1250</th>
       <td>1</td>
       <td>optimam</td>
       <td>56</td>
-      <td>2</td>
       <td>0</td>
-      <td>calcification</td>
+      <td>0</td>
       <td>NaN</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>70</td>
-      <td>4</td>
+      <td>NaN</td>
       <td>0</td>
-      <td>mass</td>
-      <td>16.87</td>
-      <td>1</td>
     </tr>
     <tr>
-      <th>2</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>70</td>
-      <td>2</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>10.15</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>66</td>
-      <td>2</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>10.71</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>4</th>
+      <th>1438</th>
       <td>1</td>
       <td>imh</td>
-      <td>49</td>
+      <td>50</td>
       <td>3</td>
-      <td>0</td>
-      <td>distortion</td>
+      <td>2</td>
       <td>NaN</td>
-      <td>1</td>
+      <td>NaN</td>
+      <td>0</td>
     </tr>
     <tr>
-      <th>5</th>
+      <th>1339</th>
+      <td>1</td>
+      <td>imh</td>
+      <td>44</td>
+      <td>2</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>191</th>
       <td>1</td>
       <td>optimam</td>
-      <td>67</td>
+      <td>101</td>
       <td>2</td>
       <td>0</td>
       <td>mass</td>
-      <td>9.24</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>47</td>
-      <td>4</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>14.35</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>51</td>
-      <td>3</td>
-      <td>0</td>
-      <td>calcification</td>
-      <td>NaN</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>50</td>
-      <td>4</td>
-      <td>0</td>
-      <td>calcification</td>
-      <td>NaN</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>59</td>
-      <td>3</td>
-      <td>0</td>
-      <td>calcification</td>
-      <td>NaN</td>
+      <td>10.31</td>
       <td>1</td>
     </tr>
   </tbody>
@@ -336,7 +303,212 @@ df_cond_abs
 
 
 
-Let's use the *AbsBoundariesCurator* to find a curated set:
+The function *get_query_features_df* applies all the queries on the *df_samples* dataframe, and we obtain df_bool, a boolean dataframe which has the samples as rows and the queries as columns. *df_bool* indicates which sample matches which query.
+
+```python
+df_bool = curator.get_query_features_df(df_samples, df_cond_abs.index)
+df_bool.head()
+```
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>is_pos == "1"</th>
+      <th>is_pos == "0"</th>
+      <th>data_source == "optimam" &amp; is_pos == "0"</th>
+      <th>data_source == "imh" &amp; is_pos == "0"</th>
+      <th>data_source == "optimam" &amp; is_pos == "1"</th>
+      <th>data_source == "imh" &amp; is_pos == "1"</th>
+      <th>lesion_type == "mass" &amp; is_pos == "1"</th>
+      <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
+      <th>birad == "1" &amp; is_pos == "0"</th>
+      <th>birad == "2" &amp; is_pos == "0"</th>
+      <th>lesion_type == "mass" &amp; largest_mass&lt;=10</th>
+      <th>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20</th>
+      <th>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50</th>
+      <th>age&lt;50</th>
+      <th>age&lt;60 &amp; age&gt;=50</th>
+      <th>age&lt;70 &amp; age&gt;=60</th>
+      <th>age&gt;=70</th>
+    </tr>
+    <tr>
+      <th>study_id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+We can use this table to quickly see how many samples in our pool satisfy each query:
+
+```python
+df_bool.sum()
+```
+
+
+
+
+    is_pos == "1"                                                 811
+    is_pos == "0"                                                 655
+    data_source == "optimam" & is_pos == "0"                      301
+    data_source == "imh" & is_pos == "0"                          354
+    data_source == "optimam" & is_pos == "1"                      653
+    data_source == "imh" & is_pos == "1"                          158
+    lesion_type == "mass" & is_pos == "1"                         556
+    lesion_type == "calcification" & is_pos == "1"                188
+    birad == "1" & is_pos == "0"                                  399
+    birad == "2" & is_pos == "0"                                  195
+    lesion_type == "mass" & largest_mass<=10                       58
+    lesion_type == "mass" & largest_mass>10 & largest_mass<=20    310
+    lesion_type == "mass" & largest_mass>20 & largest_mass<=50    178
+    age<50                                                        256
+    age<60 & age>=50                                              489
+    age<70 & age>=60                                              520
+    age>=70                                                       201
+    dtype: int64
+
+
+
+### Curate a subset using absolute bounds
+Let's use the *AbsBoundariesCurator* to build a curated set that satisfies all the conditions as much as possible:
 
 ```python
 abc = curator.AbsBoundariesCurator(df_samples, df_cond_abs)
@@ -508,130 +680,25 @@ summary
 
 
 
-As you can see above, the linear solver had 4 violations, but after we decoded the solution (round the $x_j$ values and decide which samples to include), there were 10 violations in total. Our curated set has 802 members instead of 800, specifically two extra positives. Also, we have 3 too many positive studies from optimam, and 3 too few studies from imh.
+As you can see above, the linear solver had 4 violations, but after we decoded the solution (round the $x_j$ values and decide which samples to include), there were 5 violations in total. The optimal LP target value is always going to be a lower bound on the *integer* progam target.  
 
-Now we can go back to the original samples dataframe, and add a new column indicating which samples would participate in the final set:
+Our curated set has 799 members instead of 800, specifically one extra positive. Also, we have one extra positive study from optimam, and 2 too few studies from imh.
+
+Now we can go back to the original samples dataframe, and generate the new set.
+
 
 ```python
-df_samples['included'] = included
-df_samples.head()
+df_subset = df_samples[included]
+print(len(df_subset))
 ```
 
+    799
 
 
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>exists</th>
-      <th>data_source</th>
-      <th>age</th>
-      <th>density</th>
-      <th>birad</th>
-      <th>lesion_type</th>
-      <th>largest_mass</th>
-      <th>is_pos</th>
-      <th>included</th>
-    </tr>
-    <tr>
-      <th>study_id</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>56</td>
-      <td>2</td>
-      <td>0</td>
-      <td>calcification</td>
-      <td>NaN</td>
-      <td>1</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>70</td>
-      <td>4</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>16.87</td>
-      <td>1</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>70</td>
-      <td>2</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>10.15</td>
-      <td>1</td>
-      <td>True</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>66</td>
-      <td>2</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>10.71</td>
-      <td>1</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>1</td>
-      <td>imh</td>
-      <td>49</td>
-      <td>3</td>
-      <td>0</td>
-      <td>distortion</td>
-      <td>NaN</td>
-      <td>1</td>
-      <td>True</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
-
-### Using Relative bounds for the constraints
+### Curate a subset using relative bounds
 
 The fact that the condition boundaties are given in absolute integer numbers is actually a limitation:
-Say we are willing to have some flexibility with regard to the number of negatives we curate (i.e. anything in the range 350-450 is fine), but within the chosen set of negatives, we would like 25% to be with birad=2. Since we don't know how many negatives we'll turn up with, there is no way to put a tight bound (in absolute numbers) on the number of birad=2 samples.
+Say we are willing to have some flexibility with regard to the number of negatives we curate (i.e. anything in the range 320-480 is fine), but within the chosen set of negatives, we would like at most 25% to be with birad=2. Since we don't know how many negatives we'll turn up with, there is no way to put a tight upper bound (in absolute numbers) on the number of birad=2 samples.
 
 What we want is to be able to bound a query relative to the (yet unknown) number of samples that satisfy a previous query.  So an alternative way to provide boundaries is in the form of a *fraction* relative to the resulting set satisfying a different query.
 
@@ -681,15 +748,15 @@ df_cond_rel.reset_index()
     <tr>
       <th>1</th>
       <td>is_pos == "1"</td>
-      <td>0.50</td>
-      <td>0.50</td>
+      <td>0.40</td>
+      <td>0.60</td>
       <td>0</td>
     </tr>
     <tr>
       <th>2</th>
       <td>is_pos == "0"</td>
-      <td>0.50</td>
-      <td>0.50</td>
+      <td>0.40</td>
+      <td>0.60</td>
       <td>0</td>
     </tr>
     <tr>
@@ -812,13 +879,12 @@ Let's run the *RelBoundariesCurator* to solve this (here with the simplex method
 ```python
 cc = curator.RelBoundariesCurator(df_samples, df_cond_rel)
 included, summary = cc.run()
-df_samples['included'] = included
 summary
 ```
 
-    Theoretical violations: 4.000000000000157
+    Theoretical violations: 1.7763568394002505e-15
     included: 800
-    actual violations: 4
+    actual violations: 0
 
 
 
@@ -858,98 +924,98 @@ summary
     </tr>
     <tr>
       <th>is_pos == "1"</th>
-      <td>400</td>
-      <td>400</td>
-      <td>400</td>
+      <td>395</td>
+      <td>320</td>
+      <td>480</td>
       <td>0</td>
     </tr>
     <tr>
       <th>is_pos == "0"</th>
-      <td>400</td>
-      <td>400</td>
-      <td>400</td>
+      <td>405</td>
+      <td>320</td>
+      <td>480</td>
       <td>0</td>
     </tr>
     <tr>
       <th>data_source == "optimam" &amp; is_pos == "0"</th>
-      <td>160</td>
-      <td>160</td>
-      <td>240</td>
+      <td>184</td>
+      <td>162</td>
+      <td>243</td>
       <td>0</td>
     </tr>
     <tr>
       <th>data_source == "imh" &amp; is_pos == "0"</th>
-      <td>240</td>
-      <td>160</td>
-      <td>240</td>
+      <td>221</td>
+      <td>162</td>
+      <td>243</td>
       <td>0</td>
     </tr>
     <tr>
       <th>data_source == "optimam" &amp; is_pos == "1"</th>
-      <td>242</td>
-      <td>160</td>
-      <td>240</td>
-      <td>2</td>
+      <td>237</td>
+      <td>158</td>
+      <td>237</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>data_source == "imh" &amp; is_pos == "1"</th>
       <td>158</td>
-      <td>160</td>
-      <td>240</td>
-      <td>2</td>
+      <td>158</td>
+      <td>237</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; is_pos == "1"</th>
-      <td>263</td>
-      <td>260</td>
-      <td>280</td>
+      <td>259</td>
+      <td>257</td>
+      <td>276</td>
       <td>0</td>
     </tr>
     <tr>
       <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
-      <td>120</td>
-      <td>120</td>
-      <td>140</td>
+      <td>119</td>
+      <td>118</td>
+      <td>138</td>
       <td>0</td>
     </tr>
     <tr>
       <th>birad == "1" &amp; is_pos == "0"</th>
-      <td>300</td>
-      <td>300</td>
-      <td>320</td>
+      <td>304</td>
+      <td>304</td>
+      <td>324</td>
       <td>0</td>
     </tr>
     <tr>
       <th>birad == "2" &amp; is_pos == "0"</th>
-      <td>80</td>
-      <td>80</td>
-      <td>100</td>
+      <td>81</td>
+      <td>81</td>
+      <td>101</td>
       <td>0</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; largest_mass&lt;=10</th>
-      <td>39</td>
+      <td>29</td>
       <td>26</td>
       <td>39</td>
       <td>0</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20</th>
-      <td>135</td>
-      <td>132</td>
-      <td>158</td>
+      <td>155</td>
+      <td>130</td>
+      <td>155</td>
       <td>0</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50</th>
-      <td>79</td>
-      <td>66</td>
-      <td>79</td>
+      <td>65</td>
+      <td>65</td>
+      <td>78</td>
       <td>0</td>
     </tr>
     <tr>
       <th>age&lt;50</th>
-      <td>240</td>
+      <td>200</td>
       <td>200</td>
       <td>240</td>
       <td>0</td>
@@ -970,7 +1036,7 @@ summary
     </tr>
     <tr>
       <th>age&gt;=70</th>
-      <td>120</td>
+      <td>160</td>
       <td>120</td>
       <td>160</td>
       <td>0</td>
@@ -981,4 +1047,4 @@ summary
 
 
 
-In our decoded solution, the total number of violations was 4, exactly the same as in the optimal LP solution. This means that our solution is indeed optimal, since the optimal LP target value is always a lower bound on the *integer* progam target.
+And we reached an optimal solution! 

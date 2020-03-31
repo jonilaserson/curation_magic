@@ -642,6 +642,63 @@ Each row of <em>df_cond_abs</em> is indexed by a <em>query</em> that can be appl
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>We can use this table to quickly see how many samples in our pool satisfy each query:</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df_bool</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>is_pos == &#34;1&#34;                                                 811
+is_pos == &#34;0&#34;                                                 655
+data_source == &#34;optimam&#34; &amp; is_pos == &#34;0&#34;                      301
+data_source == &#34;imh&#34; &amp; is_pos == &#34;0&#34;                          354
+data_source == &#34;optimam&#34; &amp; is_pos == &#34;1&#34;                      653
+data_source == &#34;imh&#34; &amp; is_pos == &#34;1&#34;                          158
+lesion_type == &#34;mass&#34; &amp; is_pos == &#34;1&#34;                         556
+lesion_type == &#34;calcification&#34; &amp; is_pos == &#34;1&#34;                188
+birad == &#34;1&#34; &amp; is_pos == &#34;0&#34;                                  399
+birad == &#34;2&#34; &amp; is_pos == &#34;0&#34;                                  195
+lesion_type == &#34;mass&#34; &amp; largest_mass&lt;=10                       58
+lesion_type == &#34;mass&#34; &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20    310
+lesion_type == &#34;mass&#34; &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50    178
+age&lt;50                                                        256
+age&lt;60 &amp; age&gt;=50                                              489
+age&lt;70 &amp; age&gt;=60                                              520
+age&gt;=70                                                       201
+dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Basic-definition,-an-Integer-Program">Basic definition, an Integer Program<a class="anchor-link" href="#Basic-definition,-an-Integer-Program"> </a></h2><p>Here we assume we have the boundaries given as absolute numbers
 ($a_i$=lower_bound, $b_i$=upper_bound per query $i$). 
 This means we want to have at least $a_i$ samples and at most $b_i$ samples that will satisfy query number $i$.</p>
@@ -996,7 +1053,8 @@ actual violations: 5
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>As you can see above, the linear solver had 4 violations, but after we decoded the solution (round the $x_j$ values and decide which samples to include), there were 10 violations in total. Our curated set has 802 members instead of 800, specifically two extra positives. Also, we have 3 too many positive studies from optimam, and 3 too few studies from imh.</p>
+<p>As you can see above, the linear solver had 4 violations, but after we decoded the solution (round the $x_j$ values and decide which samples to include), there were 5 violations in total. The optimal LP target value is always going to be a lower bound on the <em>integer</em> progam target.</p>
+<p>Our curated set has 799 members instead of 800, specifically one extra positive. Also, we have one extra positive study from optimam, and 2 too few studies from imh.</p>
 <p>Now we can go back to the original samples dataframe, and add a new column indicating which samples would participate in the final set:</p>
 
 </div>
@@ -1076,7 +1134,7 @@ actual violations: 5
       <td>calcification</td>
       <td>NaN</td>
       <td>1</td>
-      <td>False</td>
+      <td>True</td>
     </tr>
     <tr>
       <th>1</th>
@@ -1100,7 +1158,7 @@ actual violations: 5
       <td>mass</td>
       <td>10.15</td>
       <td>1</td>
-      <td>True</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>3</th>
@@ -1206,15 +1264,15 @@ Say we are willing to have some flexibility with regard to the number of negativ
     <tr>
       <th>1</th>
       <td>is_pos == "1"</td>
-      <td>0.50</td>
-      <td>0.50</td>
+      <td>0.40</td>
+      <td>0.60</td>
       <td>0</td>
     </tr>
     <tr>
       <th>2</th>
       <td>is_pos == "0"</td>
-      <td>0.50</td>
-      <td>0.50</td>
+      <td>0.40</td>
+      <td>0.60</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1337,7 +1395,7 @@ Say we are willing to have some flexibility with regard to the number of negativ
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Here, in line 10, we ask that the number of samples satisfying the query [<em>birad == "2" &amp; is_pos == "0"</em>] would be at least 20% and no more than 25% of the samples satisfying query 2 [<em>is_pos == "0"</em>], as indicated by the column <em>index_ref</em>. This is how we were able to define a condition relative to the negative population in our curated set!</p>
+<p>Here, in line 10, we ask that the number of samples satisfying the query [<em>birad == "2" &amp; is_pos == "0"</em>] would be at least 20% and no more than 25% of the samples satisfying query 2 [<em>is_pos == "0"</em>], as indicated by the column <em>index_ref</em>. This is how we were able to define a condition relevant to the negative set without knowing how many negative we'll have at the end!</p>
 <p>We still have to ground the solution in some absolute number of desired sample, so we used integer boundaries for the first query above, simply by setting <em>index_ref=-1</em> (otherwise the solution is not well defined and the LP solver might not converge).</p>
 <p>Now how can we incorporate those constraints in a linear program?</p>
 
@@ -1419,7 +1477,7 @@ $$</p>
 <span class="n">included</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
 <span class="c1"># Let&#39;s sanity-check that we obtained a reasonable solution.</span>
-<span class="n">tc</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">cc</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">fun</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="n">places</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">cc</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">fun</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">places</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">assertGreater</span><span class="p">(</span><span class="n">included</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mi">780</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">assertLess</span><span class="p">(</span><span class="n">included</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mi">820</span><span class="p">)</span>
 <span class="n">summary</span>
@@ -1435,9 +1493,9 @@ $$</p>
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Theoretical violations: 4.000000000000157
+<pre>Theoretical violations: 1.7763568394002505e-15
 included: 800
-actual violations: 4
+actual violations: 0
 </pre>
 </div>
 </div>
@@ -1480,98 +1538,98 @@ actual violations: 4
     </tr>
     <tr>
       <th>is_pos == "1"</th>
-      <td>400</td>
-      <td>400</td>
-      <td>400</td>
+      <td>395</td>
+      <td>320</td>
+      <td>480</td>
       <td>0</td>
     </tr>
     <tr>
       <th>is_pos == "0"</th>
-      <td>400</td>
-      <td>400</td>
-      <td>400</td>
+      <td>405</td>
+      <td>320</td>
+      <td>480</td>
       <td>0</td>
     </tr>
     <tr>
       <th>data_source == "optimam" &amp; is_pos == "0"</th>
-      <td>160</td>
-      <td>160</td>
-      <td>240</td>
+      <td>184</td>
+      <td>162</td>
+      <td>243</td>
       <td>0</td>
     </tr>
     <tr>
       <th>data_source == "imh" &amp; is_pos == "0"</th>
-      <td>240</td>
-      <td>160</td>
-      <td>240</td>
+      <td>221</td>
+      <td>162</td>
+      <td>243</td>
       <td>0</td>
     </tr>
     <tr>
       <th>data_source == "optimam" &amp; is_pos == "1"</th>
-      <td>242</td>
-      <td>160</td>
-      <td>240</td>
-      <td>2</td>
+      <td>237</td>
+      <td>158</td>
+      <td>237</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>data_source == "imh" &amp; is_pos == "1"</th>
       <td>158</td>
-      <td>160</td>
-      <td>240</td>
-      <td>2</td>
+      <td>158</td>
+      <td>237</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; is_pos == "1"</th>
-      <td>263</td>
-      <td>260</td>
-      <td>280</td>
+      <td>259</td>
+      <td>257</td>
+      <td>276</td>
       <td>0</td>
     </tr>
     <tr>
       <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
-      <td>120</td>
-      <td>120</td>
-      <td>140</td>
+      <td>119</td>
+      <td>118</td>
+      <td>138</td>
       <td>0</td>
     </tr>
     <tr>
       <th>birad == "1" &amp; is_pos == "0"</th>
-      <td>300</td>
-      <td>300</td>
-      <td>320</td>
+      <td>304</td>
+      <td>304</td>
+      <td>324</td>
       <td>0</td>
     </tr>
     <tr>
       <th>birad == "2" &amp; is_pos == "0"</th>
-      <td>80</td>
-      <td>80</td>
-      <td>100</td>
+      <td>81</td>
+      <td>81</td>
+      <td>101</td>
       <td>0</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; largest_mass&lt;=10</th>
-      <td>39</td>
+      <td>29</td>
       <td>26</td>
       <td>39</td>
       <td>0</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20</th>
-      <td>135</td>
-      <td>132</td>
-      <td>158</td>
+      <td>155</td>
+      <td>130</td>
+      <td>155</td>
       <td>0</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50</th>
-      <td>79</td>
-      <td>66</td>
-      <td>79</td>
+      <td>65</td>
+      <td>65</td>
+      <td>78</td>
       <td>0</td>
     </tr>
     <tr>
       <th>age&lt;50</th>
-      <td>240</td>
+      <td>200</td>
       <td>200</td>
       <td>240</td>
       <td>0</td>
@@ -1592,7 +1650,7 @@ actual violations: 4
     </tr>
     <tr>
       <th>age&gt;=70</th>
-      <td>120</td>
+      <td>160</td>
       <td>120</td>
       <td>160</td>
       <td>0</td>
@@ -1612,7 +1670,7 @@ actual violations: 4
 
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>In our decoded solution, the total number of violations was 4, exactly the same as in the optimal LP solution. This means that our solution is indeed optimal, since the optimal LP target value is always a lower bound on the <em>integer</em> progam target.</p>
+<p>And we reached an optimal solution!</p>
 
 </div>
 </div>
