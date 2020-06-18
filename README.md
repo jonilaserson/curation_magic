@@ -71,81 +71,81 @@ df_samples.sample(7)
   </thead>
   <tbody>
     <tr>
-      <th>1036</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>60</td>
-      <td>2</td>
-      <td>0</td>
-      <td>calcification</td>
-      <td>NaN</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>240</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>49</td>
-      <td>3</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>16.66</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>740</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>61</td>
-      <td>1</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>15.26</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1241</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>69</td>
-      <td>0</td>
-      <td>0</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>145</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>82</td>
-      <td>3</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>11.42</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1432</th>
+      <th>266</th>
       <td>1</td>
       <td>imh</td>
-      <td>49</td>
+      <td>46</td>
+      <td>3</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>835</th>
+      <td>1</td>
+      <td>optimam</td>
+      <td>59</td>
       <td>2</td>
+      <td>0</td>
+      <td>mass</td>
+      <td>21.49</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>376</th>
+      <td>1</td>
+      <td>imh</td>
+      <td>41</td>
+      <td>4</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1456</th>
+      <td>1</td>
+      <td>imh</td>
+      <td>40</td>
+      <td>3</td>
       <td>2</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>825</th>
+      <th>1086</th>
       <td>1</td>
       <td>optimam</td>
-      <td>68</td>
-      <td>3</td>
+      <td>52</td>
+      <td>2</td>
       <td>0</td>
       <td>mass</td>
-      <td>25.69</td>
+      <td>22.82</td>
       <td>1</td>
+    </tr>
+    <tr>
+      <th>870</th>
+      <td>1</td>
+      <td>optimam</td>
+      <td>58</td>
+      <td>2</td>
+      <td>0</td>
+      <td>mass</td>
+      <td>25.55</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>580</th>
+      <td>1</td>
+      <td>imh</td>
+      <td>78</td>
+      <td>1</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
     </tr>
   </tbody>
 </table>
@@ -553,6 +553,13 @@ summary
       <th>max</th>
       <th>violation</th>
     </tr>
+    <tr>
+      <th>query</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
   </thead>
   <tbody>
     <tr>
@@ -682,17 +689,195 @@ summary
 
 As you can see above, the linear solver had 4 violations, but after we decoded the solution (round the $x_j$ values and decide which samples to include), there were 5 violations in total. The optimal LP target value is always going to be a lower bound on the *integer* progam target.  
 
-Our curated set has 799 members instead of 800, specifically one extra positive. Also, we have one extra positive study from optimam, and 2 too few studies from imh.
+Our curated set has 799 members instead of 800, specifically one extra positive. Also, we have one extra positive study from optimam, and 2 too few studies from imh.  In addition, we are missing one positive study of type 'mass'.
 
-Now we can go back to the original samples dataframe, and generate the new set.
+Let's say the this latter constraint about positive masses is more important than others. We *really* want this constraint to be satisfied.  We can tweak the optimization by giving a larger penalty for each violation of this constraint.  Say 5 penalty points vs. only 1 penalty for the other conditions.
 
+```python
+df_cond_abs['penalty_per_violation'] = 1
+df_cond_abs.loc['lesion_type == "mass" & is_pos == "1"', 'penalty_per_violation'] = 5
+
+abc = curator.AbsBoundariesCurator(df_samples, df_cond_abs)
+included, summary = abc.run(method='interior-point')
+
+summary
+```
+
+    Theoretical violations: 3.9999999974722984
+    included: 801
+    actual violations: 5
+
+
+
+
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cnt</th>
+      <th>min</th>
+      <th>max</th>
+      <th>violation</th>
+    </tr>
+    <tr>
+      <th>query</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>is_pos == "1"</th>
+      <td>400</td>
+      <td>400</td>
+      <td>400</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>is_pos == "0"</th>
+      <td>401</td>
+      <td>400</td>
+      <td>400</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>data_source == "optimam" &amp; is_pos == "0"</th>
+      <td>163</td>
+      <td>160</td>
+      <td>240</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>data_source == "imh" &amp; is_pos == "0"</th>
+      <td>238</td>
+      <td>160</td>
+      <td>240</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>data_source == "optimam" &amp; is_pos == "1"</th>
+      <td>242</td>
+      <td>160</td>
+      <td>240</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>data_source == "imh" &amp; is_pos == "1"</th>
+      <td>158</td>
+      <td>160</td>
+      <td>240</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>lesion_type == "mass" &amp; is_pos == "1"</th>
+      <td>270</td>
+      <td>270</td>
+      <td>300</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
+      <td>111</td>
+      <td>110</td>
+      <td>140</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>birad == "1" &amp; is_pos == "0"</th>
+      <td>304</td>
+      <td>300</td>
+      <td>320</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>birad == "2" &amp; is_pos == "0"</th>
+      <td>85</td>
+      <td>80</td>
+      <td>100</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>lesion_type == "mass" &amp; largest_mass&lt;=10</th>
+      <td>34</td>
+      <td>30</td>
+      <td>40</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20</th>
+      <td>147</td>
+      <td>140</td>
+      <td>180</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50</th>
+      <td>84</td>
+      <td>75</td>
+      <td>110</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>age&lt;50</th>
+      <td>212</td>
+      <td>200</td>
+      <td>240</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>age&lt;60 &amp; age&gt;=50</th>
+      <td>250</td>
+      <td>216</td>
+      <td>264</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>age&lt;70 &amp; age&gt;=60</th>
+      <td>199</td>
+      <td>176</td>
+      <td>208</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>age&gt;=70</th>
+      <td>140</td>
+      <td>120</td>
+      <td>160</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+
+Goodie!  We still have 5 violations but now that positive-mass constraint is satisfied! (and we curated 801 samples instead of 800).
+
+Now we can go back to the original samples dataframe, and add a new column indicating which samples would participate in the final set:
 
 ```python
 df_subset = df_samples[included]
 print(len(df_subset))
 ```
 
-    799
+    801
 
 
 ### Curate a subset using relative bounds
@@ -912,6 +1097,13 @@ summary
       <th>min</th>
       <th>max</th>
       <th>violation</th>
+    </tr>
+    <tr>
+      <th>query</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
