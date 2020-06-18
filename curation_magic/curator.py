@@ -107,7 +107,7 @@ class Curator(object):
         np.random.seed(seed or 0)
         x = self.solution.x[:self.n_samples] * self.cnt
         r = x % 1  # The remainder
-        assert(np.abs(x.astype('int') + r - x).sum() < 1e-9)
+        assert(np.abs(x.astype('int') + r - x).sum() < 1e-9, str(x[:5])+str(r[:5])+str(x[:5].astype('int')))
         if seed is None:
             r = r.round()
         else:
