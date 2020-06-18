@@ -71,78 +71,78 @@ df_samples.sample(7)
   </thead>
   <tbody>
     <tr>
-      <th>266</th>
+      <th>848</th>
       <td>1</td>
-      <td>imh</td>
-      <td>46</td>
-      <td>3</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>optimam</td>
+      <td>72</td>
+      <td>2</td>
       <td>0</td>
+      <td>calcification</td>
+      <td>NaN</td>
+      <td>1</td>
     </tr>
     <tr>
-      <th>835</th>
+      <th>57</th>
+      <td>1</td>
+      <td>optimam</td>
+      <td>63</td>
+      <td>1</td>
+      <td>0</td>
+      <td>mass</td>
+      <td>13.72</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>383</th>
       <td>1</td>
       <td>optimam</td>
       <td>59</td>
       <td>2</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>297</th>
+      <td>1</td>
+      <td>optimam</td>
+      <td>47</td>
+      <td>1</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>669</th>
+      <td>1</td>
+      <td>optimam</td>
+      <td>70</td>
+      <td>2</td>
       <td>0</td>
       <td>mass</td>
-      <td>21.49</td>
+      <td>13.23</td>
       <td>1</td>
     </tr>
     <tr>
-      <th>376</th>
+      <th>766</th>
       <td>1</td>
-      <td>imh</td>
-      <td>41</td>
-      <td>4</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>optimam</td>
+      <td>70</td>
+      <td>2</td>
       <td>0</td>
+      <td>mass</td>
+      <td>20.44</td>
+      <td>1</td>
     </tr>
     <tr>
-      <th>1456</th>
+      <th>519</th>
       <td>1</td>
-      <td>imh</td>
-      <td>40</td>
+      <td>optimam</td>
+      <td>66</td>
       <td>3</td>
       <td>2</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>1086</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>52</td>
-      <td>2</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>22.82</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>870</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>58</td>
-      <td>2</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>25.55</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>580</th>
-      <td>1</td>
-      <td>imh</td>
-      <td>78</td>
-      <td>1</td>
-      <td>1</td>
       <td>NaN</td>
       <td>NaN</td>
       <td>0</td>
@@ -154,7 +154,7 @@ df_samples.sample(7)
 
 
 The conditions are given in a second dataframe, *df_cond_abs*. 
-Each row of *df_cond_abs* is indexed by a *query* that can be applied to the df_samples (i.e. by using df_samples.query(query_string)). For each query the user specifies constraints supplied, regarding how many samples in the curated subset should satisfy the query. The constraints are given as a lower-bound and upper bound (ignore the *index_ref* column).
+Each row of *df_cond_abs* is indexed by a *query* that can be applied to the df_samples (i.e. by using df_samples.query(query_string)). For each query the user specifies constraints supplied, regarding how many samples in the curated subset should satisfy the query. The constraints are given as a lower-bound and upper bound, as well as the penalty per violation (by default 1 if column not supplied). Ignore the *index_ref* column for now.
 
 ```python
 # Get absolute numbers constraints 
@@ -186,9 +186,11 @@ df_cond_abs
       <th>min</th>
       <th>max</th>
       <th>index_ref</th>
+      <th>penalty_per_violation</th>
     </tr>
     <tr>
       <th>query</th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -200,102 +202,119 @@ df_cond_abs
       <td>400</td>
       <td>400</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>is_pos == "0"</th>
       <td>400</td>
       <td>400</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>data_source == "optimam" &amp; is_pos == "0"</th>
       <td>160</td>
       <td>240</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>data_source == "imh" &amp; is_pos == "0"</th>
       <td>160</td>
       <td>240</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>data_source == "optimam" &amp; is_pos == "1"</th>
       <td>160</td>
       <td>240</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>data_source == "imh" &amp; is_pos == "1"</th>
       <td>160</td>
       <td>240</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; is_pos == "1"</th>
       <td>270</td>
       <td>300</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
       <td>110</td>
       <td>140</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>birad == "1" &amp; is_pos == "0"</th>
       <td>300</td>
       <td>320</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>birad == "2" &amp; is_pos == "0"</th>
       <td>80</td>
       <td>100</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; largest_mass&lt;=10</th>
       <td>30</td>
       <td>40</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20</th>
       <td>140</td>
       <td>180</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50</th>
       <td>75</td>
       <td>110</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>age&lt;50</th>
       <td>200</td>
       <td>240</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>age&lt;60 &amp; age&gt;=50</th>
       <td>216</td>
       <td>264</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>age&lt;70 &amp; age&gt;=60</th>
       <td>176</td>
       <td>208</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>age&gt;=70</th>
       <td>120</td>
       <td>160</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
   </tbody>
 </table>

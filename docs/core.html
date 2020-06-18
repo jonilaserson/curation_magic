@@ -234,7 +234,7 @@ description: "API details will follow"
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The conditions are given in a second dataframe, <em>df_cond_abs</em>. 
-Each row of <em>df_cond_abs</em> is indexed by a <em>query</em> that can be applied to the df_samples (i.e. by using df_samples.query(query_string)). For each query the user specifies constraints supplied, regarding how many samples in the curated subset should satisfy the query. The constraints are given as a lower-bound and upper bound (ignore the <em>index_ref</em> column).</p>
+Each row of <em>df_cond_abs</em> is indexed by a <em>query</em> that can be applied to the df_samples (i.e. by using df_samples.query(query_string)). For each query the user specifies constraints supplied, regarding how many samples in the curated subset should satisfy the query. The constraints are given as a lower-bound and upper bound, as well as the penalty per violation (by default 1 if column not supplied). Ignore the <em>index_ref</em> column for now.</p>
 
 </div>
 </div>
@@ -870,7 +870,7 @@ $$</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="AbsBoundariesCurator" class="doc_header"><code>class</code> <code>AbsBoundariesCurator</code><a href="https://github.com/jonilaserson/curation_magic/tree/master/curation_magic/curator.py#L155" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>AbsBoundariesCurator</code>(<strong><code>df</code></strong>, <strong><code>df_cond</code></strong>, <strong><code>dedup</code></strong>=<em><code>True</code></em>, <strong><code>allow_violations</code></strong>=<em><code>True</code></em>) :: <a href="/curation_magic/core#Curator"><code>Curator</code></a></p>
+<h2 id="AbsBoundariesCurator" class="doc_header"><code>class</code> <code>AbsBoundariesCurator</code><a href="https://github.com/jonilaserson/curation_magic/tree/master/curation_magic/curator.py#L166" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>AbsBoundariesCurator</code>(<strong><code>df</code></strong>, <strong><code>df_cond</code></strong>, <strong><code>dedup</code></strong>=<em><code>True</code></em>, <strong><code>allow_violations</code></strong>=<em><code>True</code></em>) :: <a href="/curation_magic/core#Curator"><code>Curator</code></a></p>
 </blockquote>
 
 </div>
@@ -923,9 +923,9 @@ $$</p>
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Theoretical violations: 3.9999999974722984
-included: 801
-actual violations: 5
+<pre>Theoretical penalty: 4.000000001349921
+Actual penalty: 5   Total violations: 5
+Included: 799
 </pre>
 </div>
 </div>
@@ -955,10 +955,12 @@ actual violations: 5
       <th>cnt</th>
       <th>min</th>
       <th>max</th>
+      <th>total</th>
       <th>violation</th>
     </tr>
     <tr>
       <th>query</th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -968,65 +970,74 @@ actual violations: 5
   <tbody>
     <tr>
       <th>is_pos == "1"</th>
+      <td>399</td>
       <td>400</td>
       <td>400</td>
-      <td>400</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>is_pos == "0"</th>
-      <td>401</td>
-      <td>400</td>
-      <td>400</td>
+      <td>811</td>
       <td>1</td>
     </tr>
     <tr>
+      <th>is_pos == "0"</th>
+      <td>400</td>
+      <td>400</td>
+      <td>400</td>
+      <td>655</td>
+      <td>0</td>
+    </tr>
+    <tr>
       <th>data_source == "optimam" &amp; is_pos == "0"</th>
-      <td>163</td>
+      <td>161</td>
       <td>160</td>
       <td>240</td>
+      <td>301</td>
       <td>0</td>
     </tr>
     <tr>
       <th>data_source == "imh" &amp; is_pos == "0"</th>
-      <td>238</td>
+      <td>239</td>
       <td>160</td>
       <td>240</td>
+      <td>354</td>
       <td>0</td>
     </tr>
     <tr>
       <th>data_source == "optimam" &amp; is_pos == "1"</th>
-      <td>242</td>
+      <td>241</td>
       <td>160</td>
       <td>240</td>
-      <td>2</td>
+      <td>653</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>data_source == "imh" &amp; is_pos == "1"</th>
       <td>158</td>
       <td>160</td>
       <td>240</td>
+      <td>158</td>
       <td>2</td>
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; is_pos == "1"</th>
-      <td>270</td>
+      <td>269</td>
       <td>270</td>
       <td>300</td>
-      <td>0</td>
+      <td>556</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
       <td>111</td>
       <td>110</td>
       <td>140</td>
+      <td>188</td>
       <td>0</td>
     </tr>
     <tr>
       <th>birad == "1" &amp; is_pos == "0"</th>
-      <td>304</td>
+      <td>303</td>
       <td>300</td>
       <td>320</td>
+      <td>399</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1034,6 +1045,7 @@ actual violations: 5
       <td>85</td>
       <td>80</td>
       <td>100</td>
+      <td>195</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1041,6 +1053,7 @@ actual violations: 5
       <td>34</td>
       <td>30</td>
       <td>40</td>
+      <td>58</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1048,6 +1061,7 @@ actual violations: 5
       <td>147</td>
       <td>140</td>
       <td>180</td>
+      <td>310</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1055,6 +1069,7 @@ actual violations: 5
       <td>84</td>
       <td>75</td>
       <td>110</td>
+      <td>178</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1062,20 +1077,23 @@ actual violations: 5
       <td>212</td>
       <td>200</td>
       <td>240</td>
+      <td>256</td>
       <td>0</td>
     </tr>
     <tr>
       <th>age&lt;60 &amp; age&gt;=50</th>
-      <td>250</td>
+      <td>249</td>
       <td>216</td>
       <td>264</td>
+      <td>489</td>
       <td>0</td>
     </tr>
     <tr>
       <th>age&lt;70 &amp; age&gt;=60</th>
-      <td>199</td>
+      <td>198</td>
       <td>176</td>
       <td>208</td>
+      <td>520</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1083,6 +1101,7 @@ actual violations: 5
       <td>140</td>
       <td>120</td>
       <td>160</td>
+      <td>201</td>
       <td>0</td>
     </tr>
   </tbody>
@@ -1139,9 +1158,9 @@ actual violations: 5
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Theoretical violations: 3.9999999974722984
-included: 801
-actual violations: 5
+<pre>Theoretical penalty: 3.9999999974722984
+Actual penalty: 5   Total violations: 5
+Included: 801
 </pre>
 </div>
 </div>
@@ -1171,10 +1190,12 @@ actual violations: 5
       <th>cnt</th>
       <th>min</th>
       <th>max</th>
+      <th>total</th>
       <th>violation</th>
     </tr>
     <tr>
       <th>query</th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -1187,6 +1208,7 @@ actual violations: 5
       <td>400</td>
       <td>400</td>
       <td>400</td>
+      <td>811</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1194,6 +1216,7 @@ actual violations: 5
       <td>401</td>
       <td>400</td>
       <td>400</td>
+      <td>655</td>
       <td>1</td>
     </tr>
     <tr>
@@ -1201,6 +1224,7 @@ actual violations: 5
       <td>163</td>
       <td>160</td>
       <td>240</td>
+      <td>301</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1208,6 +1232,7 @@ actual violations: 5
       <td>238</td>
       <td>160</td>
       <td>240</td>
+      <td>354</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1215,6 +1240,7 @@ actual violations: 5
       <td>242</td>
       <td>160</td>
       <td>240</td>
+      <td>653</td>
       <td>2</td>
     </tr>
     <tr>
@@ -1222,6 +1248,7 @@ actual violations: 5
       <td>158</td>
       <td>160</td>
       <td>240</td>
+      <td>158</td>
       <td>2</td>
     </tr>
     <tr>
@@ -1229,6 +1256,7 @@ actual violations: 5
       <td>270</td>
       <td>270</td>
       <td>300</td>
+      <td>556</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1236,6 +1264,7 @@ actual violations: 5
       <td>111</td>
       <td>110</td>
       <td>140</td>
+      <td>188</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1243,6 +1272,7 @@ actual violations: 5
       <td>304</td>
       <td>300</td>
       <td>320</td>
+      <td>399</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1250,6 +1280,7 @@ actual violations: 5
       <td>85</td>
       <td>80</td>
       <td>100</td>
+      <td>195</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1257,6 +1288,7 @@ actual violations: 5
       <td>34</td>
       <td>30</td>
       <td>40</td>
+      <td>58</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1264,6 +1296,7 @@ actual violations: 5
       <td>147</td>
       <td>140</td>
       <td>180</td>
+      <td>310</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1271,6 +1304,7 @@ actual violations: 5
       <td>84</td>
       <td>75</td>
       <td>110</td>
+      <td>178</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1278,6 +1312,7 @@ actual violations: 5
       <td>212</td>
       <td>200</td>
       <td>240</td>
+      <td>256</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1285,6 +1320,7 @@ actual violations: 5
       <td>250</td>
       <td>216</td>
       <td>264</td>
+      <td>489</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1292,6 +1328,7 @@ actual violations: 5
       <td>199</td>
       <td>176</td>
       <td>208</td>
+      <td>520</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1299,6 +1336,7 @@ actual violations: 5
       <td>140</td>
       <td>120</td>
       <td>160</td>
+      <td>201</td>
       <td>0</td>
     </tr>
   </tbody>
@@ -1402,7 +1440,7 @@ actual violations: 5
       <td>calcification</td>
       <td>NaN</td>
       <td>1</td>
-      <td>False</td>
+      <td>True</td>
     </tr>
     <tr>
       <th>1</th>
@@ -1414,7 +1452,7 @@ actual violations: 5
       <td>mass</td>
       <td>16.87</td>
       <td>1</td>
-      <td>True</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>2</th>
@@ -1714,7 +1752,7 @@ $$</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="RelBoundariesCurator" class="doc_header"><code>class</code> <code>RelBoundariesCurator</code><a href="https://github.com/jonilaserson/curation_magic/tree/master/curation_magic/curator.py#L184" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RelBoundariesCurator</code>(<strong><code>df</code></strong>, <strong><code>df_cond</code></strong>, <strong><code>dedup</code></strong>=<em><code>True</code></em>, <strong><code>allow_violations</code></strong>=<em><code>True</code></em>) :: <a href="/curation_magic/core#Curator"><code>Curator</code></a></p>
+<h2 id="RelBoundariesCurator" class="doc_header"><code>class</code> <code>RelBoundariesCurator</code><a href="https://github.com/jonilaserson/curation_magic/tree/master/curation_magic/curator.py#L195" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RelBoundariesCurator</code>(<strong><code>df</code></strong>, <strong><code>df_cond</code></strong>, <strong><code>dedup</code></strong>=<em><code>True</code></em>, <strong><code>allow_violations</code></strong>=<em><code>True</code></em>) :: <a href="/curation_magic/core#Curator"><code>Curator</code></a></p>
 </blockquote>
 
 </div>
@@ -1763,9 +1801,9 @@ $$</p>
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Theoretical violations: 1.7763568394002505e-15
-included: 800
-actual violations: 0
+<pre>Theoretical penalty: 1.7763568394002505e-15
+Actual penalty: 0   Total violations: 0
+Included: 800
 </pre>
 </div>
 </div>
@@ -1795,10 +1833,12 @@ actual violations: 0
       <th>cnt</th>
       <th>min</th>
       <th>max</th>
+      <th>total</th>
       <th>violation</th>
     </tr>
     <tr>
       <th>query</th>
+      <th></th>
       <th></th>
       <th></th>
       <th></th>
@@ -1811,6 +1851,7 @@ actual violations: 0
       <td>800</td>
       <td>800</td>
       <td>800</td>
+      <td>1466</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1818,6 +1859,7 @@ actual violations: 0
       <td>395</td>
       <td>320</td>
       <td>480</td>
+      <td>811</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1825,6 +1867,7 @@ actual violations: 0
       <td>405</td>
       <td>320</td>
       <td>480</td>
+      <td>655</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1832,6 +1875,7 @@ actual violations: 0
       <td>184</td>
       <td>162</td>
       <td>243</td>
+      <td>301</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1839,6 +1883,7 @@ actual violations: 0
       <td>221</td>
       <td>162</td>
       <td>243</td>
+      <td>354</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1846,6 +1891,7 @@ actual violations: 0
       <td>237</td>
       <td>158</td>
       <td>237</td>
+      <td>653</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1853,6 +1899,7 @@ actual violations: 0
       <td>158</td>
       <td>158</td>
       <td>237</td>
+      <td>158</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1860,6 +1907,7 @@ actual violations: 0
       <td>259</td>
       <td>257</td>
       <td>276</td>
+      <td>556</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1867,6 +1915,7 @@ actual violations: 0
       <td>119</td>
       <td>118</td>
       <td>138</td>
+      <td>188</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1874,6 +1923,7 @@ actual violations: 0
       <td>304</td>
       <td>304</td>
       <td>324</td>
+      <td>399</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1881,6 +1931,7 @@ actual violations: 0
       <td>81</td>
       <td>81</td>
       <td>101</td>
+      <td>195</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1888,6 +1939,7 @@ actual violations: 0
       <td>29</td>
       <td>26</td>
       <td>39</td>
+      <td>58</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1895,6 +1947,7 @@ actual violations: 0
       <td>155</td>
       <td>130</td>
       <td>155</td>
+      <td>310</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1902,6 +1955,7 @@ actual violations: 0
       <td>65</td>
       <td>65</td>
       <td>78</td>
+      <td>178</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1909,6 +1963,7 @@ actual violations: 0
       <td>200</td>
       <td>200</td>
       <td>240</td>
+      <td>256</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1916,6 +1971,7 @@ actual violations: 0
       <td>264</td>
       <td>216</td>
       <td>264</td>
+      <td>489</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1923,6 +1979,7 @@ actual violations: 0
       <td>176</td>
       <td>176</td>
       <td>208</td>
+      <td>520</td>
       <td>0</td>
     </tr>
     <tr>
@@ -1930,6 +1987,7 @@ actual violations: 0
       <td>160</td>
       <td>120</td>
       <td>160</td>
+      <td>201</td>
       <td>0</td>
     </tr>
   </tbody>

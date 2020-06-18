@@ -61,7 +61,8 @@ class Curator(object):
             A, self.ix, self.cnt = np.unique(A, return_inverse=True, return_counts=True, axis=1)
             # Multiply each (binary) column of A by the number of samples with those features.
             A = A * self.cnt
-            #self.df_bool = pd.DataFrame(data=A.T, columns=df_bool.columns)
+        else:
+            self.cnt = 1
 
         self.n_constraints, self.n_samples = A.shape
         logger.info('#constraints=%d, #samples=%d' % A.shape)
@@ -101,17 +102,24 @@ class Curator(object):
         """Returns a dictionary with the arguments to scipy.optimize.linprog"""
         raise NotImplementedError
 
-    def decode_solution(self):
+    def decode_solution(self, seed=None):
         """Returns a boolean vector of size n_samples, indicating chosen samples."""
+        np.random.seed(seed or 0)
+        x = self.solution.x[:self.n_samples] * self.cnt
+        r = x % 1  # The remainder
+        assert(np.abs(x.astype('int') + r - x).sum() < 1e-9)
+        if seed is None:
+            r = r.round()
+        else:
+            r = np.random.rand(len(x)) <= r
+
+        x = x.astype('int') + r.astype('int')
 
         if not self.dedup:
-            # Original samples, just round.
-            included = self.solution.x[:self.n_samples].round().astype('int')
+            # Original samples
+            included = x
         else:
-            # Original x counts fraction (between 0-1) of samples to take from each group.
-            # Convert it to (integer) number of samples to take from each group:
-            x = (self.solution.x[:self.n_samples] * self.cnt).round().astype('int')
-
+            # x is number of samples to take from each group.
             # Randomly choose from each group:
             included = np.zeros((len(self.ix),), dtype='bool')
             for g, cnt_g in enumerate(x):
@@ -120,7 +128,6 @@ class Curator(object):
                 included[included_members] = True
 
         self.included = included
-        print('included:', included.sum())
         return included
 
     def get_summary(self, included):
@@ -130,12 +137,16 @@ class Curator(object):
 
         summary_df = self.get_abs_bounds(self.df_cond, cnt=cnt)
         summary_df['cnt'] = cnt
+        summary_df['total'] = self.df_bool.sum()
         summary_df['violation'] = pd.DataFrame([summary_df['min'] - summary_df['cnt'],
                                                 summary_df['cnt'] - summary_df['max']]).max().clip(0, None)
-        print('actual violations:', summary_df['violation'].sum())
-        return summary_df[['cnt', 'min', 'max', 'violation']]
+        print('Actual penalty:', summary_df['violation'].dot(summary_df['penalty_per_violation']), '  '
+              'Total violations:', summary_df['violation'].sum())
+        print('Included:', included.sum())
 
-    def run(self, method='revised simplex'):
+        return summary_df[['cnt', 'min', 'max', 'total', 'violation']]
+
+    def run(self, method='revised simplex', seed=None):
         """Apply the LP. Use method='interior-point' for faster and less accurate solution."""
 
         included = summary_df = None
@@ -143,8 +154,8 @@ class Curator(object):
         logger.info(self.solution.message)
 
         if self.solution.success:
-            print("Theoretical violations:", self.solution.fun)
-            included = self.decode_solution()
+            included = self.decode_solution(seed=seed)
+            print("Theoretical penalty:", self.solution.fun)
             summary_df = self.get_summary(included)
         else:
             logger.error("Could not find solution.")
