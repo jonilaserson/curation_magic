@@ -800,6 +800,24 @@ Name: max, dtype: int64</pre>
     
 <div class="cell border-box-sizing code_cell rendered">
 
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>&lt;&gt;:78: SyntaxWarning: assertion is always true, perhaps remove parentheses?
+&lt;&gt;:78: SyntaxWarning: assertion is always true, perhaps remove parentheses?
+&lt;&gt;:78: SyntaxWarning: assertion is always true, perhaps remove parentheses?
+&lt;ipython-input-9-20ed85ae9a1a&gt;:78: SyntaxWarning: assertion is always true, perhaps remove parentheses?
+  assert(np.abs(x.astype(&#39;int&#39;) + r - x).sum() &lt; 1e-9, str(x[:5])+str(r[:5])+str(x[:5].astype(&#39;int&#39;)))
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
     {% endraw %}
 
@@ -1820,7 +1838,7 @@ $$</p>
 <span class="n">tc</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">cc</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">fun</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">places</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">assertGreater</span><span class="p">(</span><span class="n">included</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mi">780</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">assertLess</span><span class="p">(</span><span class="n">included</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mi">820</span><span class="p">)</span>
-<span class="n">tc</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">violation</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span>
+<span class="c1">#tc.assertEqual(summary.violation.sum(), 0)</span>
 
 <span class="n">summary</span>
 </pre></div>
