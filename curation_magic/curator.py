@@ -27,7 +27,6 @@ def get_query_features_df(df_samples, queries):
         except Exception as e:
             print(query, e)
             raise
-    df_bool.sum()
     return df_bool
 
 
@@ -38,53 +37,67 @@ class Curator(object):
         :param df: dataframe of samples (one row per samples).
         :param df_cond: dataframe of indexed by queries that can be applied to df,
                         and the columns 'min', 'max', and 'index_ref' representing
-                        required for each query boundaries.
+                        the required number of samples that should satisfy each query.
+                        The column 'penalty_per_violation', if exist, indicates how much
+                        violation penalty would a single unit of violation in each query
+                        will cost (by default, 1)
         :param dedup: whether to combine rows that match the same set of queries.
                       If True (default), works faster, but slightly less accurate.
         :param allow_violations: Allow infeasible solutions (should generally be True).
         """
 
         self.df_bool = get_query_features_df(df, df_cond.index)
-        self.df_cond = df_cond
+        self.df_cond = df_cond.copy()
         self.dedup = dedup
         self.allow_violations = allow_violations
 
-        A = self.df_bool.values.astype('float').T
-        b = df_cond.values
+        if 'penalty_per_violation' not in self.df_cond:
+            self.df_cond['penalty_per_violation'] = 1
+        self.df_cond['index_ref'] = self.df_cond['index_ref'].astype('int')
+
+        A = self.df_bool.values.astype('float').T # A.shape = [queries, samples]
 
         if dedup:
             A, self.ix, self.cnt = np.unique(A, return_inverse=True, return_counts=True, axis=1)
+            # Multiply each (binary) column of A by the number of samples with those features.
             A = A * self.cnt
+            #self.df_bool = pd.DataFrame(data=A.T, columns=df_bool.columns)
 
         self.n_constraints, self.n_samples = A.shape
         logger.info('#constraints=%d, #samples=%d' % A.shape)
 
-        self.linprog_params = self.get_LP_params(A, b)
+        self.linprog_params = self.get_LP_params(A, self.df_cond)
 
         for key, val in self.linprog_params.items():
             logger.debug(key, np.shape(val))
 
+
     @staticmethod
-    def get_abs_bounds(b, cnt=None):
+    def get_abs_bounds(df_cond, cnt=None):
         """Convert bounds from relative fractions to absolute quantities.
 
            :param b: a matrix of shape (n_constraints, 3) where each row (l, u, j)
                      if j = -1:  the constraint is    "between l and u"
                      otherwise:  the constraint is    "between l*y_j and u*y_j"
-                                 where y_j is the number of samples that satisfy query j.
+                                 where y_j is the number of *included* samples that satisfy query j,
+                                 given by the cnt parameter.
 
-           :param cnt: if cnt is not None, y_j = cnt[j]. Otherwise, infer the bounds by looking
+           :param cnt: how many *currently included* samples are satisfy each query.
+                       if cnt is not None, y_j = cnt[j]. Otherwise, infer the bounds by looking
                        at the l and u values of b[j, :].
         """
+        df_cond = df_cond.copy()
+        cond_min = df_cond['min']
+        cond_max = df_cond['max']
+        for i, j in enumerate(df_cond['index_ref']):
+            if j != -1:
+                cond_min.iat[i] *= (cond_min.iat[j] if cnt is None else cnt[j])
+                cond_max.iat[i] *= (cond_max.iat[j] if cnt is None else cnt[j])
 
-        for i, j in enumerate(b[:, 2]):
-            j = int(j)
-            if  j != -1:
-                b[i, 0] = (b[j, 0] if cnt is None else cnt[j]) * b[i, 0]
-                b[i, 1] = (b[j, 1] if cnt is None else cnt[j]) * b[i, 1]
-        return b.round().astype('int')
+        df_cond[['min', 'max']] = df_cond[['min', 'max']].round().astype('int')
+        return df_cond
 
-    def get_LP_params(self, A, b):
+    def get_LP_params(self, A, df_cond):
         """Returns a dictionary with the arguments to scipy.optimize.linprog"""
         raise NotImplementedError
 
@@ -114,15 +127,13 @@ class Curator(object):
         """Get summary of the queries, boundaries, and the violations."""
 
         cnt = self.df_bool[included.astype('bool')].sum()
-        summary_df = cnt.to_frame('cnt')
 
-        b = self.get_abs_bounds(self.df_cond.values, cnt=cnt)
-        summary_df['min'] = b[:, 0]
-        summary_df['max'] = b[:, 1]
+        summary_df = self.get_abs_bounds(self.df_cond, cnt=cnt)
+        summary_df['cnt'] = cnt
         summary_df['violation'] = pd.DataFrame([summary_df['min'] - summary_df['cnt'],
                                                 summary_df['cnt'] - summary_df['max']]).max().clip(0, None)
         print('actual violations:', summary_df['violation'].sum())
-        return summary_df
+        return summary_df[['cnt', 'min', 'max', 'violation']]
 
     def run(self, method='revised simplex'):
         """Apply the LP. Use method='interior-point' for faster and less accurate solution."""
@@ -142,24 +153,27 @@ class Curator(object):
 
 # Cell
 class AbsBoundariesCurator(Curator):
-    def get_LP_params(self, A, b):
+    def get_LP_params(self, A, df_cond):
         n_constraints, n_samples = A.shape
-        b = self.get_abs_bounds(b)
+        df_cond = self.get_abs_bounds(df_cond) # In case the user supplied relative bounds
 
         bounds = [(0, 1)] * n_samples
         c = [0] * n_samples
 
         # Upper bound
-        b_ub = b[:, 1]
-        b_lb = b[:, 0]
+        b_ub = df_cond['max'].values
+        b_lb = df_cond['min'].values
         b_ub = np.hstack((b_ub, -b_lb))
 
-        A_ub = np.vstack([A, # A * x <= b
-                         -A])# A * x >= a ==> -A * x <= -a
+        A_ub = np.vstack([A, # A * x <= ub
+                         -A])# A * x >= lb ==> -A * x <= -lb
 
         if self.allow_violations: # Support non-feasible scenarios (pay penalty)
+            # Add a new variable for every constraint, representing the violation.
             bounds += [(0, None)] * n_constraints
-            c += [1] * n_constraints
+            c += df_cond['penalty_per_violation'].tolist()
+
+            # Update the constraints to allow violations by c
             C = np.eye(n_constraints)
             A_ub = np.hstack((A_ub, np.vstack((-C, -C))))
 
@@ -168,7 +182,8 @@ class AbsBoundariesCurator(Curator):
 
 # Cell
 class RelBoundariesCurator(Curator):
-    def get_LP_params(self, A, b):
+    def get_LP_params(self, A, df_cond):
+        b = df_cond[['min', 'max', 'index_ref']].values
         n_constraints, n_samples = A.shape
 
         #             X's                          Y's
@@ -184,12 +199,12 @@ class RelBoundariesCurator(Curator):
         Y_ub = Y.copy()
         Y_lb = Y.copy()
 
-        b_ub = b[:, 1]
-        b_lb = b[:, 0]
-        for i, (a_i, b_i, j) in enumerate(b):
+        b_ub = df_cond['max'].values.copy()
+        b_lb = df_cond['min'].values.copy()
+        for i, j in enumerate(df_cond['index_ref']):
             if j != -1:
-                Y_ub[i, int(j)] = -b_i
-                Y_lb[i, int(j)] = -a_i
+                Y_ub[i, j] = -b_ub[i]
+                Y_lb[i, j] = -b_lb[i]
                 b_ub[i] = b_lb[i] = 0
         b_ub = np.hstack((b_ub, -b_lb))
 
@@ -198,8 +213,11 @@ class RelBoundariesCurator(Curator):
 
 
         if self.allow_violations: # Support non-feasible scenarios (pay penalty)
+            # Add a new variable for every constraint, representing the violation.
             bounds += [(0, None)] * n_constraints
-            c += [1] * n_constraints
+            c += df_cond['penalty_per_violation'].tolist()
+
+            # Update the constraints to allow violations by c
             C = np.eye(n_constraints)
             A_ub = np.hstack((A_ub, np.vstack((-C, -C))))
             A_eq = np.hstack((A_eq, np.zeros((n_constraints, n_constraints))))

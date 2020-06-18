@@ -727,6 +727,44 @@ $$</p>
     {% raw %}
     
 <div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df_cond</span> <span class="o">=</span> <span class="n">df_cond_abs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">q</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_cond</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">row</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">999</span>
+<span class="n">df_cond</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">4</span><span class="p">][</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>query
+data_source == &#34;imh&#34; &amp; is_pos == &#34;0&#34;    999
+Name: max, dtype: int64</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
 
 </div>
     {% endraw %}
@@ -742,7 +780,7 @@ $$</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="Curator" class="doc_header"><code>class</code> <code>Curator</code><a href="https://github.com/jonilaserson/curation_magic/tree/master/curation_magic/curator.py#L35" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Curator</code>(<strong><code>df</code></strong>, <strong><code>df_cond</code></strong>, <strong><code>dedup</code></strong>=<em><code>True</code></em>, <strong><code>allow_violations</code></strong>=<em><code>True</code></em>)</p>
+<h2 id="Curator" class="doc_header"><code>class</code> <code>Curator</code><a href="https://github.com/jonilaserson/curation_magic/tree/master/curation_magic/curator.py#L34" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>Curator</code>(<strong><code>df</code></strong>, <strong><code>df_cond</code></strong>, <strong><code>dedup</code></strong>=<em><code>True</code></em>, <strong><code>allow_violations</code></strong>=<em><code>True</code></em>)</p>
 </blockquote>
 
 </div>
@@ -759,6 +797,7 @@ $$</p>
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="De-duplication">De-duplication<a class="anchor-link" href="#De-duplication"> </a></h3><p>By default, we're also using de-duping: In many cases samples would have identical feature vectors. Hence in such cases we collapse every <em>group</em> $j$ of samples with identical feature rows to a single row, and we denote by $m_j$ the number of samples in the group. However, this has an effect on the linear progam, since now every $x_j$ indicates the fraction of samples from the <em>group</em> $j$ that is going to be included in the curated set.</p>
 <p>Hence, We need to replace every occurence of $$\left(\sum_{j: A_{ji}=1} x_j \right)$$ with $$\left(\sum_{j: A_{ji}=1} m_j x_j \right)$$</p>
+<p>Alternatively we can multiply each row $j$ of $A$ by $m_j$.</p>
 
 </div>
 </div>
@@ -781,11 +820,12 @@ For example, if $x_j=0.7$ and $m_j$=4, then $n_j=3$.</li>
 <h2 id="AbsBoundariesCurator:-Relaxing-to-linear-progam">AbsBoundariesCurator: Relaxing to linear progam<a class="anchor-link" href="#AbsBoundariesCurator:-Relaxing-to-linear-progam"> </a></h2><p>To turn this into a <em>linear</em> program, we need to perform a few relaxations.
 First, we will let our $x_j$'s become real numbers between 0 and 1 (we'll round them up or down later).
 Second, we introduce auxiliary variables, $c_i$'s, one per query, that will measure the <em>violation</em> of each query.
-Now our goal is to minimize the total number of violations.</p>
-<p>Out <em>linear</em> progam now looks like this:
+Now our goal is to minimize the total number of violations, $c_1 + c_2 + ... + c_N$.</p>
+<p>Of course, not all violations are created equal, the user might want to enforce a stronger penalty for violating some conditions over others.  If the user provides the penalty for violating for each constraint, our target method becomes $p_1c_1 + p_2c_2 + ... + p_Nc_N$, where $p_i$ is the penalty-per-violation of query $i$.</p>
+<p>Our <em>linear</em> progam now looks like this:
 $$
 \begin{array}{lrcl}
-\min &amp;&amp;&amp;c_1 + c_2 + ... + c_N \\
+\min &amp;&amp;&amp;p_1c_1 + p_2c_2 + ... + p_Nc_N \\
 \text{s.t.}\hspace{0.5in}&amp;&amp;&amp;&amp;\\
 &amp;a_i - c_i &amp;\leq&amp; \left(\sum_{j: A_{ji}=1} x_j \right) \leq b_i + c_i &amp; \text{(for each query $i$)}\\
 &amp;0 &amp;\leq&amp; x_j \leq 1&amp; \text{(for each sample $j$)}\\
@@ -830,7 +870,7 @@ $$</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="AbsBoundariesCurator" class="doc_header"><code>class</code> <code>AbsBoundariesCurator</code><a href="https://github.com/jonilaserson/curation_magic/tree/master/curation_magic/curator.py#L144" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>AbsBoundariesCurator</code>(<strong><code>df</code></strong>, <strong><code>df_cond</code></strong>, <strong><code>dedup</code></strong>=<em><code>True</code></em>, <strong><code>allow_violations</code></strong>=<em><code>True</code></em>) :: <a href="/curation_magic/core#Curator"><code>Curator</code></a></p>
+<h2 id="AbsBoundariesCurator" class="doc_header"><code>class</code> <code>AbsBoundariesCurator</code><a href="https://github.com/jonilaserson/curation_magic/tree/master/curation_magic/curator.py#L155" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>AbsBoundariesCurator</code>(<strong><code>df</code></strong>, <strong><code>df_cond</code></strong>, <strong><code>dedup</code></strong>=<em><code>True</code></em>, <strong><code>allow_violations</code></strong>=<em><code>True</code></em>) :: <a href="/curation_magic/core#Curator"><code>Curator</code></a></p>
 </blockquote>
 
 </div>
@@ -883,8 +923,8 @@ $$</p>
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Theoretical violations: 4.000000001349921
-included: 799
+<pre>Theoretical violations: 3.9999999974722984
+included: 801
 actual violations: 5
 </pre>
 </div>
@@ -917,42 +957,49 @@ actual violations: 5
       <th>max</th>
       <th>violation</th>
     </tr>
+    <tr>
+      <th>query</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
   </thead>
   <tbody>
     <tr>
       <th>is_pos == "1"</th>
-      <td>399</td>
-      <td>400</td>
-      <td>400</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>is_pos == "0"</th>
       <td>400</td>
       <td>400</td>
       <td>400</td>
       <td>0</td>
     </tr>
     <tr>
+      <th>is_pos == "0"</th>
+      <td>401</td>
+      <td>400</td>
+      <td>400</td>
+      <td>1</td>
+    </tr>
+    <tr>
       <th>data_source == "optimam" &amp; is_pos == "0"</th>
-      <td>161</td>
+      <td>163</td>
       <td>160</td>
       <td>240</td>
       <td>0</td>
     </tr>
     <tr>
       <th>data_source == "imh" &amp; is_pos == "0"</th>
-      <td>239</td>
+      <td>238</td>
       <td>160</td>
       <td>240</td>
       <td>0</td>
     </tr>
     <tr>
       <th>data_source == "optimam" &amp; is_pos == "1"</th>
-      <td>241</td>
+      <td>242</td>
       <td>160</td>
       <td>240</td>
-      <td>1</td>
+      <td>2</td>
     </tr>
     <tr>
       <th>data_source == "imh" &amp; is_pos == "1"</th>
@@ -963,10 +1010,10 @@ actual violations: 5
     </tr>
     <tr>
       <th>lesion_type == "mass" &amp; is_pos == "1"</th>
-      <td>269</td>
+      <td>270</td>
       <td>270</td>
       <td>300</td>
-      <td>1</td>
+      <td>0</td>
     </tr>
     <tr>
       <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
@@ -977,7 +1024,7 @@ actual violations: 5
     </tr>
     <tr>
       <th>birad == "1" &amp; is_pos == "0"</th>
-      <td>303</td>
+      <td>304</td>
       <td>300</td>
       <td>320</td>
       <td>0</td>
@@ -1019,14 +1066,14 @@ actual violations: 5
     </tr>
     <tr>
       <th>age&lt;60 &amp; age&gt;=50</th>
-      <td>249</td>
+      <td>250</td>
       <td>216</td>
       <td>264</td>
       <td>0</td>
     </tr>
     <tr>
       <th>age&lt;70 &amp; age&gt;=60</th>
-      <td>198</td>
+      <td>199</td>
       <td>176</td>
       <td>208</td>
       <td>0</td>
@@ -1054,7 +1101,228 @@ actual violations: 5
 <div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>As you can see above, the linear solver had 4 violations, but after we decoded the solution (round the $x_j$ values and decide which samples to include), there were 5 violations in total. The optimal LP target value is always going to be a lower bound on the <em>integer</em> progam target.</p>
-<p>Our curated set has 799 members instead of 800, specifically one extra positive. Also, we have one extra positive study from optimam, and 2 too few studies from imh.</p>
+<p>Our curated set has 799 members instead of 800, specifically one extra positive. Also, we have one extra positive study from optimam, and 2 too few studies from imh.  In addition, we are missing one positive study of type 'mass'.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's say the this latter constraint about positive masses is more important than others. We <em>really</em> want this constraint to be satisfied.  We can tweak the optimization by giving a larger penalty for each violation of this constraint.  Say 5 penalty points vs. only 1 penalty for the other conditions.</p>
+
+</div>
+</div>
+</div>
+    {% raw %}
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">df_cond_abs</span><span class="p">[</span><span class="s1">&#39;penalty_per_violation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">df_cond_abs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;lesion_type == &quot;mass&quot; &amp; is_pos == &quot;1&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;penalty_per_violation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span>
+
+<span class="n">cc</span> <span class="o">=</span> <span class="n">AbsBoundariesCurator</span><span class="p">(</span><span class="n">df_samples</span><span class="p">,</span> <span class="n">df_cond_abs</span><span class="p">)</span>
+<span class="n">included</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;interior-point&#39;</span><span class="p">)</span>
+
+<span class="n">summary</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Theoretical violations: 3.9999999974722984
+included: 801
+actual violations: 5
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cnt</th>
+      <th>min</th>
+      <th>max</th>
+      <th>violation</th>
+    </tr>
+    <tr>
+      <th>query</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>is_pos == "1"</th>
+      <td>400</td>
+      <td>400</td>
+      <td>400</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>is_pos == "0"</th>
+      <td>401</td>
+      <td>400</td>
+      <td>400</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>data_source == "optimam" &amp; is_pos == "0"</th>
+      <td>163</td>
+      <td>160</td>
+      <td>240</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>data_source == "imh" &amp; is_pos == "0"</th>
+      <td>238</td>
+      <td>160</td>
+      <td>240</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>data_source == "optimam" &amp; is_pos == "1"</th>
+      <td>242</td>
+      <td>160</td>
+      <td>240</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>data_source == "imh" &amp; is_pos == "1"</th>
+      <td>158</td>
+      <td>160</td>
+      <td>240</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>lesion_type == "mass" &amp; is_pos == "1"</th>
+      <td>270</td>
+      <td>270</td>
+      <td>300</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
+      <td>111</td>
+      <td>110</td>
+      <td>140</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>birad == "1" &amp; is_pos == "0"</th>
+      <td>304</td>
+      <td>300</td>
+      <td>320</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>birad == "2" &amp; is_pos == "0"</th>
+      <td>85</td>
+      <td>80</td>
+      <td>100</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>lesion_type == "mass" &amp; largest_mass&lt;=10</th>
+      <td>34</td>
+      <td>30</td>
+      <td>40</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20</th>
+      <td>147</td>
+      <td>140</td>
+      <td>180</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50</th>
+      <td>84</td>
+      <td>75</td>
+      <td>110</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>age&lt;50</th>
+      <td>212</td>
+      <td>200</td>
+      <td>240</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>age&lt;60 &amp; age&gt;=50</th>
+      <td>250</td>
+      <td>216</td>
+      <td>264</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>age&lt;70 &amp; age&gt;=60</th>
+      <td>199</td>
+      <td>176</td>
+      <td>208</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>age&gt;=70</th>
+      <td>140</td>
+      <td>120</td>
+      <td>160</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+    {% endraw %}
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Goodie!  We still have 5 violations but now that positive-mass constraint is satisfied! (and we curated 801 samples instead of 800).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <p>Now we can go back to the original samples dataframe, and add a new column indicating which samples would participate in the final set:</p>
 
 </div>
@@ -1134,7 +1402,7 @@ actual violations: 5
       <td>calcification</td>
       <td>NaN</td>
       <td>1</td>
-      <td>True</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>1</th>
@@ -1413,7 +1681,7 @@ $y_{k_i}$ is the (yet unknown) number of elements satisfying query $k_i$ in the 
 <p>Out <em>linear</em> progam now looks like this (after conversion to upper-bound constraints):
 $$
 \begin{array}{lrcl}
-\min &amp;&amp;&amp;c_1 + c_2 + ... + c_N \\
+\min &amp;&amp;&amp;p_1c_1 + p_2c_2 + ... + p_Nc_N \\
 \text{s.t.}\hspace{0.5in}&amp;&amp;&amp;&amp;\\
 &amp;y_i = \left(\sum_{j: A_{ji}=1} x_j \right) \\
 &amp;y_i - c_i - b_i \cdot y_{k_i} &amp;\leq&amp; 0 &amp; \text{(for each query $i$)}\\
@@ -1446,7 +1714,7 @@ $$</p>
 
 
 <div class="output_markdown rendered_html output_subarea ">
-<h2 id="RelBoundariesCurator" class="doc_header"><code>class</code> <code>RelBoundariesCurator</code><a href="https://github.com/jonilaserson/curation_magic/tree/master/curation_magic/curator.py#L170" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RelBoundariesCurator</code>(<strong><code>df</code></strong>, <strong><code>df_cond</code></strong>, <strong><code>dedup</code></strong>=<em><code>True</code></em>, <strong><code>allow_violations</code></strong>=<em><code>True</code></em>) :: <a href="/curation_magic/core#Curator"><code>Curator</code></a></p>
+<h2 id="RelBoundariesCurator" class="doc_header"><code>class</code> <code>RelBoundariesCurator</code><a href="https://github.com/jonilaserson/curation_magic/tree/master/curation_magic/curator.py#L184" class="source_link" style="float:right">[source]</a></h2><blockquote><p><code>RelBoundariesCurator</code>(<strong><code>df</code></strong>, <strong><code>df_cond</code></strong>, <strong><code>dedup</code></strong>=<em><code>True</code></em>, <strong><code>allow_violations</code></strong>=<em><code>True</code></em>) :: <a href="/curation_magic/core#Curator"><code>Curator</code></a></p>
 </blockquote>
 
 </div>
@@ -1480,6 +1748,8 @@ $$</p>
 <span class="n">tc</span><span class="o">.</span><span class="n">assertAlmostEqual</span><span class="p">(</span><span class="n">cc</span><span class="o">.</span><span class="n">solution</span><span class="o">.</span><span class="n">fun</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">places</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">assertGreater</span><span class="p">(</span><span class="n">included</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mi">780</span><span class="p">)</span>
 <span class="n">tc</span><span class="o">.</span><span class="n">assertLess</span><span class="p">(</span><span class="n">included</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mi">820</span><span class="p">)</span>
+<span class="n">tc</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">violation</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span>
+
 <span class="n">summary</span>
 </pre></div>
 
@@ -1526,6 +1796,13 @@ actual violations: 0
       <th>min</th>
       <th>max</th>
       <th>violation</th>
+    </tr>
+    <tr>
+      <th>query</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
