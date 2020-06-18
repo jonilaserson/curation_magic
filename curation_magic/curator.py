@@ -183,7 +183,6 @@ class AbsBoundariesCurator(Curator):
 # Cell
 class RelBoundariesCurator(Curator):
     def get_LP_params(self, A, df_cond):
-        b = df_cond[['min', 'max', 'index_ref']].values
         n_constraints, n_samples = A.shape
 
         #             X's                          Y's
