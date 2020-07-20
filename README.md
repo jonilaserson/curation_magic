@@ -10,21 +10,19 @@ The user provides two dataframes: the first has the sample pool, and the second 
 
 `pip install curation_magic`
 
-## Instructions
+## Problem Definition
 Our goal is to curate a subset from a general pool of samples, that will satisfy a list of conditions as close as possible.
 
 The pool of samples is given in a dataframe, which we'll call *df_samples*, it has one row per sample, and the columns represent all sort of meta data and features of the samples.
 
-Let's see an example:
+Let's see an example, where our general pool is the list of passengers on board the titanic (originally published by Kaggle):
 
 ```python
 # Load dataframe from file.
 import pandas as pd
 
-df_samples = pd.read_csv('csvs/curation_pool.csv', 
-                         converters={'age':int, 'birad':int})
-df_samples = df_samples.set_index('study_id')
-df_samples.sample(7)
+df_samples = pd.read_csv('csvs/titanic.csv')
+df_samples.head()
 ```
 
 
@@ -48,104 +46,71 @@ df_samples.sample(7)
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>exists</th>
-      <th>data_source</th>
-      <th>age</th>
-      <th>density</th>
-      <th>birad</th>
-      <th>lesion_type</th>
-      <th>largest_mass</th>
-      <th>is_pos</th>
-    </tr>
-    <tr>
-      <th>study_id</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
+      <th>Survived</th>
+      <th>Pclass</th>
+      <th>Name</th>
+      <th>Sex</th>
+      <th>Age</th>
+      <th>Siblings/Spouses Aboard</th>
+      <th>Parents/Children Aboard</th>
+      <th>Fare</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>865</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>66</td>
-      <td>2</td>
+      <th>0</th>
       <td>0</td>
-      <td>mass</td>
-      <td>21.42</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>464</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>64</td>
-      <td>2</td>
-      <td>2</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>758</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>64</td>
-      <td>2</td>
-      <td>0</td>
-      <td>mass</td>
-      <td>17.01</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1183</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>57</td>
-      <td>4</td>
-      <td>1</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>492</th>
-      <td>1</td>
-      <td>optimam</td>
-      <td>56</td>
-      <td>4</td>
-      <td>2</td>
-      <td>NaN</td>
-      <td>NaN</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>549</th>
-      <td>1</td>
-      <td>imh</td>
-      <td>47</td>
       <td>3</td>
+      <td>Mr. Owen Harris Braund</td>
+      <td>male</td>
+      <td>22.0</td>
       <td>1</td>
-      <td>NaN</td>
-      <td>NaN</td>
       <td>0</td>
+      <td>7.2500</td>
     </tr>
     <tr>
-      <th>1300</th>
+      <th>1</th>
       <td>1</td>
-      <td>imh</td>
-      <td>54</td>
-      <td>3</td>
       <td>1</td>
-      <td>NaN</td>
-      <td>NaN</td>
+      <td>Mrs. John Bradley (Florence Briggs Thayer) Cum...</td>
+      <td>female</td>
+      <td>38.0</td>
+      <td>1</td>
       <td>0</td>
+      <td>71.2833</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>3</td>
+      <td>Miss. Laina Heikkinen</td>
+      <td>female</td>
+      <td>26.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>7.9250</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>1</td>
+      <td>Mrs. Jacques Heath (Lily May Peel) Futrelle</td>
+      <td>female</td>
+      <td>35.0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>53.1000</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>3</td>
+      <td>Mr. William Henry Allen</td>
+      <td>male</td>
+      <td>35.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>8.0500</td>
     </tr>
   </tbody>
 </table>
@@ -154,7 +119,7 @@ df_samples.sample(7)
 
 
 The conditions are given in a second dataframe, *df_cond_abs*. 
-Each row of *df_cond_abs* is indexed by a *query* that can be applied to the df_samples (i.e. by using df_samples.query(query_string)). For each query the user specifies constraints supplied, regarding how many samples in the curated subset should satisfy the query. The constraints are given as a lower-bound and upper bound, as well as the penalty per violation (by default 1 if column not supplied). Ignore the *index_ref* column for now.
+Each row of *df_cond_abs* is indexed by a *query* that can be applied to the df_samples (i.e. by using df_samples.query(query_string)). For each query the user specifies constraints supplied, regarding how many samples in the curated subset should satisfy the query. The constraints are given as a lower-bound and upper bound, as well as the penalty per violation (by default 1 if the penalty column not supplied). Ignore the *index_ref* column for now.
 
 ```python
 # Get absolute numbers constraints 
@@ -183,6 +148,7 @@ df_cond_abs
   <thead>
     <tr style="text-align: right;">
       <th></th>
+      <th>id</th>
       <th>min</th>
       <th>max</th>
       <th>index_ref</th>
@@ -194,125 +160,135 @@ df_cond_abs
       <th></th>
       <th></th>
       <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>is_pos == "1"</th>
-      <td>400</td>
-      <td>400</td>
+      <th>Survived &gt;= 0</th>
+      <td>0</td>
+      <td>200</td>
+      <td>200</td>
       <td>-1</td>
       <td>1</td>
     </tr>
     <tr>
-      <th>is_pos == "0"</th>
-      <td>400</td>
-      <td>400</td>
-      <td>-1</td>
+      <th>Survived == 1</th>
       <td>1</td>
-    </tr>
-    <tr>
-      <th>data_source == "optimam" &amp; is_pos == "0"</th>
-      <td>160</td>
-      <td>240</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>data_source == "imh" &amp; is_pos == "0"</th>
-      <td>160</td>
-      <td>240</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>data_source == "optimam" &amp; is_pos == "1"</th>
-      <td>160</td>
-      <td>240</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>data_source == "imh" &amp; is_pos == "1"</th>
-      <td>160</td>
-      <td>240</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>lesion_type == "mass" &amp; is_pos == "1"</th>
-      <td>270</td>
-      <td>300</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
-      <td>110</td>
-      <td>140</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>birad == "1" &amp; is_pos == "0"</th>
-      <td>300</td>
-      <td>320</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>birad == "2" &amp; is_pos == "0"</th>
-      <td>80</td>
+      <td>100</td>
       <td>100</td>
       <td>-1</td>
       <td>1</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&lt;=10</th>
+      <th>Survived == 0</th>
+      <td>2</td>
+      <td>100</td>
+      <td>100</td>
+      <td>-1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Survived == 1 &amp; Sex == 'female'</th>
+      <td>3</td>
+      <td>48</td>
+      <td>52</td>
+      <td>-1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Survived == 0 &amp; Sex == 'female'</th>
+      <td>4</td>
+      <td>48</td>
+      <td>52</td>
+      <td>-1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Survived == 1 &amp; Pclass == 1</th>
+      <td>5</td>
       <td>30</td>
-      <td>40</td>
+      <td>35</td>
       <td>-1</td>
       <td>1</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20</th>
-      <td>140</td>
-      <td>180</td>
+      <th>Survived == 1 &amp; Pclass == 2</th>
+      <td>6</td>
+      <td>30</td>
+      <td>35</td>
       <td>-1</td>
       <td>1</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50</th>
-      <td>75</td>
-      <td>110</td>
+      <th>Survived == 1 &amp; Pclass == 3</th>
+      <td>7</td>
+      <td>30</td>
+      <td>35</td>
       <td>-1</td>
       <td>1</td>
     </tr>
     <tr>
-      <th>age&lt;50</th>
-      <td>200</td>
-      <td>240</td>
+      <th>Survived == 0 &amp; Pclass == 1</th>
+      <td>8</td>
+      <td>30</td>
+      <td>35</td>
       <td>-1</td>
       <td>1</td>
     </tr>
     <tr>
-      <th>age&lt;60 &amp; age&gt;=50</th>
-      <td>216</td>
-      <td>264</td>
+      <th>Survived == 0 &amp; Pclass == 2</th>
+      <td>9</td>
+      <td>30</td>
+      <td>35</td>
       <td>-1</td>
       <td>1</td>
     </tr>
     <tr>
-      <th>age&lt;70 &amp; age&gt;=60</th>
-      <td>176</td>
-      <td>208</td>
+      <th>Survived == 0 &amp; Pclass == 3</th>
+      <td>10</td>
+      <td>30</td>
+      <td>35</td>
       <td>-1</td>
       <td>1</td>
     </tr>
     <tr>
-      <th>age&gt;=70</th>
-      <td>120</td>
-      <td>160</td>
+      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
+      <td>11</td>
+      <td>8</td>
+      <td>12</td>
+      <td>-1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Age &lt; 20</th>
+      <td>12</td>
+      <td>48</td>
+      <td>52</td>
+      <td>-1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
+      <td>13</td>
+      <td>48</td>
+      <td>52</td>
+      <td>-1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
+      <td>14</td>
+      <td>48</td>
+      <td>52</td>
+      <td>-1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Age &gt;= 40</th>
+      <td>15</td>
+      <td>48</td>
+      <td>52</td>
       <td>-1</td>
       <td>1</td>
     </tr>
@@ -350,43 +326,22 @@ df_bool.head()
   <thead>
     <tr style="text-align: right;">
       <th></th>
-      <th>is_pos == "1"</th>
-      <th>is_pos == "0"</th>
-      <th>data_source == "optimam" &amp; is_pos == "0"</th>
-      <th>data_source == "imh" &amp; is_pos == "0"</th>
-      <th>data_source == "optimam" &amp; is_pos == "1"</th>
-      <th>data_source == "imh" &amp; is_pos == "1"</th>
-      <th>lesion_type == "mass" &amp; is_pos == "1"</th>
-      <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
-      <th>birad == "1" &amp; is_pos == "0"</th>
-      <th>birad == "2" &amp; is_pos == "0"</th>
-      <th>lesion_type == "mass" &amp; largest_mass&lt;=10</th>
-      <th>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20</th>
-      <th>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50</th>
-      <th>age&lt;50</th>
-      <th>age&lt;60 &amp; age&gt;=50</th>
-      <th>age&lt;70 &amp; age&gt;=60</th>
-      <th>age&gt;=70</th>
-    </tr>
-    <tr>
-      <th>study_id</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
+      <th>Survived &gt;= 0</th>
+      <th>Survived == 1</th>
+      <th>Survived == 0</th>
+      <th>Survived == 1 &amp; Sex == 'female'</th>
+      <th>Survived == 0 &amp; Sex == 'female'</th>
+      <th>Survived == 1 &amp; Pclass == 1</th>
+      <th>Survived == 1 &amp; Pclass == 2</th>
+      <th>Survived == 1 &amp; Pclass == 3</th>
+      <th>Survived == 0 &amp; Pclass == 1</th>
+      <th>Survived == 0 &amp; Pclass == 2</th>
+      <th>Survived == 0 &amp; Pclass == 3</th>
+      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
+      <th>Age &lt; 20</th>
+      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
+      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
+      <th>Age &gt;= 40</th>
     </tr>
   </thead>
   <tbody>
@@ -394,16 +349,15 @@ df_bool.head()
       <th>0</th>
       <td>True</td>
       <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
       <td>True</td>
       <td>False</td>
       <td>False</td>
       <td>False</td>
       <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>True</td>
       <td>False</td>
       <td>False</td>
       <td>True</td>
@@ -413,33 +367,28 @@ df_bool.head()
     <tr>
       <th>1</th>
       <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
       <td>True</td>
       <td>False</td>
       <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
       <td>False</td>
       <td>True</td>
       <td>False</td>
       <td>False</td>
       <td>False</td>
       <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
       <td>True</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>2</th>
       <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
       <td>True</td>
       <td>False</td>
       <td>True</td>
-      <td>False</td>
       <td>False</td>
       <td>False</td>
       <td>False</td>
@@ -448,22 +397,24 @@ df_bool.head()
       <td>False</td>
       <td>False</td>
       <td>False</td>
+      <td>False</td>
       <td>True</td>
+      <td>False</td>
+      <td>False</td>
     </tr>
     <tr>
       <th>3</th>
       <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
       <td>True</td>
       <td>False</td>
       <td>True</td>
       <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
       <td>True</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
+      <td>False</td>
       <td>False</td>
       <td>False</td>
       <td>False</td>
@@ -474,9 +425,6 @@ df_bool.head()
       <th>4</th>
       <td>True</td>
       <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
       <td>True</td>
       <td>False</td>
       <td>False</td>
@@ -488,6 +436,8 @@ df_bool.head()
       <td>True</td>
       <td>False</td>
       <td>False</td>
+      <td>False</td>
+      <td>True</td>
       <td>False</td>
     </tr>
   </tbody>
@@ -505,23 +455,22 @@ df_bool.sum()
 
 
 
-    is_pos == "1"                                                 811
-    is_pos == "0"                                                 655
-    data_source == "optimam" & is_pos == "0"                      301
-    data_source == "imh" & is_pos == "0"                          354
-    data_source == "optimam" & is_pos == "1"                      653
-    data_source == "imh" & is_pos == "1"                          158
-    lesion_type == "mass" & is_pos == "1"                         556
-    lesion_type == "calcification" & is_pos == "1"                188
-    birad == "1" & is_pos == "0"                                  399
-    birad == "2" & is_pos == "0"                                  195
-    lesion_type == "mass" & largest_mass<=10                       58
-    lesion_type == "mass" & largest_mass>10 & largest_mass<=20    310
-    lesion_type == "mass" & largest_mass>20 & largest_mass<=50    178
-    age<50                                                        256
-    age<60 & age>=50                                              489
-    age<70 & age>=60                                              520
-    age>=70                                                       201
+    Survived >= 0                                    887
+    Survived == 1                                    342
+    Survived == 0                                    545
+    Survived == 1 & Sex == 'female'                  233
+    Survived == 0 & Sex == 'female'                   81
+    Survived == 1 & Pclass == 1                      136
+    Survived == 1 & Pclass == 2                       87
+    Survived == 1 & Pclass == 3                      119
+    Survived == 0 & Pclass == 1                       80
+    Survived == 0 & Pclass == 2                       97
+    Survived == 0 & Pclass == 3                      368
+    Survived == 0 & Pclass == 1 & Sex == 'female'      3
+    Age < 20                                         199
+    Age < 30 & Age >= 20                             293
+    Age < 40 & Age >= 30                             199
+    Age >= 40                                        196
     dtype: int64
 
 
@@ -541,9 +490,17 @@ included, summary = abc.run(method='interior-point')
 summary
 ```
 
-    Theoretical violations: 4.000000001349921
-    included: 799
-    actual violations: 5
+    /cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option 'cholesky':True failed. It is normal for this to happen occasionally, especially as the solution is approached. However, if you see this frequently, consider setting option 'cholesky' to False.
+      self.solution = linprog(method=method, **self.linprog_params)
+    /cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option 'sym_pos':True failed. It is normal for this to happen occasionally, especially as the solution is approached. However, if you see this frequently, consider setting option 'sym_pos' to False.
+      self.solution = linprog(method=method, **self.linprog_params)
+    /cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option 'sym_pos':False failed. This may happen occasionally, especially as the solution is approached. However, if you see this frequently, your problem may be numerically challenging. If you cannot improve the formulation, consider setting 'lstsq' to True. Consider also setting `presolve` to True, if it is not already.
+      self.solution = linprog(method=method, **self.linprog_params)
+
+
+    Theoretical penalty: 8.999999999971957
+    Actual penalty: 9   Total violations: 9
+    Included: 200
 
 
 
@@ -570,6 +527,7 @@ summary
       <th>cnt</th>
       <th>min</th>
       <th>max</th>
+      <th>total</th>
       <th>violation</th>
     </tr>
     <tr>
@@ -578,126 +536,136 @@ summary
       <th></th>
       <th></th>
       <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>is_pos == "1"</th>
-      <td>399</td>
-      <td>400</td>
-      <td>400</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>is_pos == "0"</th>
-      <td>400</td>
-      <td>400</td>
-      <td>400</td>
+      <th>Survived &gt;= 0</th>
+      <td>200</td>
+      <td>200</td>
+      <td>200</td>
+      <td>887</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>data_source == "optimam" &amp; is_pos == "0"</th>
-      <td>161</td>
-      <td>160</td>
-      <td>240</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>data_source == "imh" &amp; is_pos == "0"</th>
-      <td>239</td>
-      <td>160</td>
-      <td>240</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>data_source == "optimam" &amp; is_pos == "1"</th>
-      <td>241</td>
-      <td>160</td>
-      <td>240</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>data_source == "imh" &amp; is_pos == "1"</th>
-      <td>158</td>
-      <td>160</td>
-      <td>240</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>lesion_type == "mass" &amp; is_pos == "1"</th>
-      <td>269</td>
-      <td>270</td>
-      <td>300</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
-      <td>111</td>
-      <td>110</td>
-      <td>140</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>birad == "1" &amp; is_pos == "0"</th>
-      <td>303</td>
-      <td>300</td>
-      <td>320</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>birad == "2" &amp; is_pos == "0"</th>
-      <td>85</td>
-      <td>80</td>
+      <th>Survived == 1</th>
       <td>100</td>
+      <td>100</td>
+      <td>100</td>
+      <td>342</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&lt;=10</th>
+      <th>Survived == 0</th>
+      <td>100</td>
+      <td>100</td>
+      <td>100</td>
+      <td>545</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Survived == 1 &amp; Sex == 'female'</th>
+      <td>50</td>
+      <td>48</td>
+      <td>52</td>
+      <td>233</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Survived == 0 &amp; Sex == 'female'</th>
+      <td>48</td>
+      <td>48</td>
+      <td>52</td>
+      <td>81</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Survived == 1 &amp; Pclass == 1</th>
+      <td>33</td>
+      <td>30</td>
+      <td>35</td>
+      <td>136</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Survived == 1 &amp; Pclass == 2</th>
       <td>34</td>
       <td>30</td>
-      <td>40</td>
+      <td>35</td>
+      <td>87</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20</th>
-      <td>147</td>
-      <td>140</td>
-      <td>180</td>
+      <th>Survived == 1 &amp; Pclass == 3</th>
+      <td>33</td>
+      <td>30</td>
+      <td>35</td>
+      <td>119</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50</th>
-      <td>84</td>
-      <td>75</td>
-      <td>110</td>
+      <th>Survived == 0 &amp; Pclass == 1</th>
+      <td>30</td>
+      <td>30</td>
+      <td>35</td>
+      <td>80</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>age&lt;50</th>
-      <td>212</td>
-      <td>200</td>
-      <td>240</td>
+      <th>Survived == 0 &amp; Pclass == 2</th>
+      <td>31</td>
+      <td>30</td>
+      <td>35</td>
+      <td>97</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>age&lt;60 &amp; age&gt;=50</th>
-      <td>249</td>
-      <td>216</td>
-      <td>264</td>
+      <th>Survived == 0 &amp; Pclass == 3</th>
+      <td>39</td>
+      <td>30</td>
+      <td>35</td>
+      <td>368</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
+      <td>3</td>
+      <td>8</td>
+      <td>12</td>
+      <td>3</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>Age &lt; 20</th>
+      <td>49</td>
+      <td>48</td>
+      <td>52</td>
+      <td>199</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>age&lt;70 &amp; age&gt;=60</th>
-      <td>198</td>
-      <td>176</td>
-      <td>208</td>
+      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
+      <td>50</td>
+      <td>48</td>
+      <td>52</td>
+      <td>293</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>age&gt;=70</th>
-      <td>140</td>
-      <td>120</td>
-      <td>160</td>
+      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
+      <td>51</td>
+      <td>48</td>
+      <td>52</td>
+      <td>199</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Age &gt;= 40</th>
+      <td>50</td>
+      <td>48</td>
+      <td>52</td>
+      <td>196</td>
       <td>0</td>
     </tr>
   </tbody>
@@ -706,25 +674,27 @@ summary
 
 
 
-As you can see above, the linear solver had 4 violations, but after we decoded the solution (round the $x_j$ values and decide which samples to include), there were 5 violations in total. The optimal LP target value is always going to be a lower bound on the *integer* progam target.  
+As you can see above, the linear solver had 9 violations, but after we decoded the solution (round the $x_j$ values and decide which samples to include), there were 13 violations in total. The optimal LP target value is always going to be a lower bound on the *integer* progam target.  
 
-Our curated set has 799 members instead of 800, specifically one extra positive. Also, we have one extra positive study from optimam, and 2 too few studies from imh.  In addition, we are missing one positive study of type 'mass'.
+We see that our pool has only 3 women from first-class (Pclass=1) who did not survive, so we are bound to have at least 5 violations there, since our condition on this set asks for 8 members. Our final curated set has 196 members instead of 200. 
 
-Let's say the this latter constraint about positive masses is more important than others. We *really* want this constraint to be satisfied.  We can tweak the optimization by giving a larger penalty for each violation of this constraint.  Say 5 penalty points vs. only 1 penalty for the other conditions.
+
+We are also missing 4 non-surviving women in general. Let's see if we can fix up this amount.
+We can tweak the optimization by giving a larger penalty for each violation of this constraint.  Say 5 penalty points vs. only 1 penalty for the other conditions.
 
 ```python
 df_cond_abs['penalty_per_violation'] = 1
-df_cond_abs.loc['lesion_type == "mass" & is_pos == "1"', 'penalty_per_violation'] = 5
+df_cond_abs.loc["Survived == 0 & Sex == 'female'", 'penalty_per_violation'] = 5
 
-abc = curator.AbsBoundariesCurator(df_samples, df_cond_abs)
-included, summary = abc.run(method='interior-point')
+cc = curator.AbsBoundariesCurator(df_samples, df_cond_abs)
+included, summary = cc.run(method='interior-point')
 
 summary
 ```
 
-    Theoretical violations: 3.9999999974722984
-    included: 801
-    actual violations: 5
+    Theoretical penalty: 8.999999999971957
+    Actual penalty: 9   Total violations: 9
+    Included: 200
 
 
 
@@ -751,6 +721,7 @@ summary
       <th>cnt</th>
       <th>min</th>
       <th>max</th>
+      <th>total</th>
       <th>violation</th>
     </tr>
     <tr>
@@ -759,126 +730,136 @@ summary
       <th></th>
       <th></th>
       <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>is_pos == "1"</th>
-      <td>400</td>
-      <td>400</td>
-      <td>400</td>
+      <th>Survived &gt;= 0</th>
+      <td>200</td>
+      <td>200</td>
+      <td>200</td>
+      <td>887</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>is_pos == "0"</th>
-      <td>401</td>
-      <td>400</td>
-      <td>400</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>data_source == "optimam" &amp; is_pos == "0"</th>
-      <td>163</td>
-      <td>160</td>
-      <td>240</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>data_source == "imh" &amp; is_pos == "0"</th>
-      <td>238</td>
-      <td>160</td>
-      <td>240</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>data_source == "optimam" &amp; is_pos == "1"</th>
-      <td>242</td>
-      <td>160</td>
-      <td>240</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>data_source == "imh" &amp; is_pos == "1"</th>
-      <td>158</td>
-      <td>160</td>
-      <td>240</td>
-      <td>2</td>
-    </tr>
-    <tr>
-      <th>lesion_type == "mass" &amp; is_pos == "1"</th>
-      <td>270</td>
-      <td>270</td>
-      <td>300</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
-      <td>111</td>
-      <td>110</td>
-      <td>140</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>birad == "1" &amp; is_pos == "0"</th>
-      <td>304</td>
-      <td>300</td>
-      <td>320</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>birad == "2" &amp; is_pos == "0"</th>
-      <td>85</td>
-      <td>80</td>
+      <th>Survived == 1</th>
       <td>100</td>
+      <td>100</td>
+      <td>100</td>
+      <td>342</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&lt;=10</th>
+      <th>Survived == 0</th>
+      <td>100</td>
+      <td>100</td>
+      <td>100</td>
+      <td>545</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Survived == 1 &amp; Sex == 'female'</th>
+      <td>50</td>
+      <td>48</td>
+      <td>52</td>
+      <td>233</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Survived == 0 &amp; Sex == 'female'</th>
+      <td>48</td>
+      <td>48</td>
+      <td>52</td>
+      <td>81</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Survived == 1 &amp; Pclass == 1</th>
+      <td>33</td>
+      <td>30</td>
+      <td>35</td>
+      <td>136</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Survived == 1 &amp; Pclass == 2</th>
       <td>34</td>
       <td>30</td>
-      <td>40</td>
+      <td>35</td>
+      <td>87</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20</th>
-      <td>147</td>
-      <td>140</td>
-      <td>180</td>
+      <th>Survived == 1 &amp; Pclass == 3</th>
+      <td>33</td>
+      <td>30</td>
+      <td>35</td>
+      <td>119</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50</th>
-      <td>84</td>
-      <td>75</td>
-      <td>110</td>
+      <th>Survived == 0 &amp; Pclass == 1</th>
+      <td>30</td>
+      <td>30</td>
+      <td>35</td>
+      <td>80</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>age&lt;50</th>
-      <td>212</td>
-      <td>200</td>
-      <td>240</td>
+      <th>Survived == 0 &amp; Pclass == 2</th>
+      <td>31</td>
+      <td>30</td>
+      <td>35</td>
+      <td>97</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>age&lt;60 &amp; age&gt;=50</th>
-      <td>250</td>
-      <td>216</td>
-      <td>264</td>
-      <td>0</td>
+      <th>Survived == 0 &amp; Pclass == 3</th>
+      <td>39</td>
+      <td>30</td>
+      <td>35</td>
+      <td>368</td>
+      <td>4</td>
     </tr>
     <tr>
-      <th>age&lt;70 &amp; age&gt;=60</th>
+      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
+      <td>3</td>
+      <td>8</td>
+      <td>12</td>
+      <td>3</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>Age &lt; 20</th>
+      <td>49</td>
+      <td>48</td>
+      <td>52</td>
       <td>199</td>
-      <td>176</td>
-      <td>208</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>age&gt;=70</th>
-      <td>140</td>
-      <td>120</td>
-      <td>160</td>
+      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
+      <td>50</td>
+      <td>48</td>
+      <td>52</td>
+      <td>293</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
+      <td>51</td>
+      <td>48</td>
+      <td>52</td>
+      <td>199</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Age &gt;= 40</th>
+      <td>50</td>
+      <td>48</td>
+      <td>52</td>
+      <td>196</td>
       <td>0</td>
     </tr>
   </tbody>
@@ -887,7 +868,7 @@ summary
 
 
 
-Goodie!  We still have 5 violations but now that positive-mass constraint is satisfied! (and we curated 801 samples instead of 800).
+Goodie!  This constraing is now satisfied, and we reduced the integral gap to 0 (since the actual penalty = theoretical penalty), which means we are at the optimal solution!
 
 Now we can go back to the original samples dataframe, and add a new column indicating which samples would participate in the final set:
 
@@ -896,13 +877,13 @@ df_subset = df_samples[included]
 print(len(df_subset))
 ```
 
-    801
+    200
 
 
 ### Curate a subset using relative bounds
 
 The fact that the condition boundaties are given in absolute integer numbers is actually a limitation:
-Say we are willing to have some flexibility with regard to the number of negatives we curate (i.e. anything in the range 320-480 is fine), but within the chosen set of negatives, we would like at most 25% to be with birad=2. Since we don't know how many negatives we'll turn up with, there is no way to put a tight upper bound (in absolute numbers) on the number of birad=2 samples.
+Say we are willing to have some flexibility with regard to the number of negatives we curate (i.e. anything in the range 90-110 is fine), but within the chosen set of negatives, we would like 49-51% to be females. Since we don't know how many negatives we'll turn up with, there is no way to put a tight bound (in absolute numbers) on the number of negative female samples.
 
 What we want is to be able to bound a query relative to the (yet unknown) number of samples that satisfy a previous query.  So an alternative way to provide boundaries is in the form of a *fraction* relative to the resulting set satisfying a different query.
 
@@ -936,137 +917,157 @@ df_cond_rel.reset_index()
     <tr style="text-align: right;">
       <th></th>
       <th>query</th>
+      <th>id</th>
       <th>min</th>
       <th>max</th>
       <th>index_ref</th>
+      <th>penalty_per_violation</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <th>0</th>
-      <td>exists == "1"</td>
-      <td>800.00</td>
-      <td>800.00</td>
+      <td>Survived &gt;= 0</td>
+      <td>0</td>
+      <td>200.00</td>
+      <td>200.00</td>
       <td>-1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>1</th>
-      <td>is_pos == "1"</td>
-      <td>0.40</td>
-      <td>0.60</td>
+      <td>Survived == 1</td>
+      <td>1</td>
+      <td>0.45</td>
+      <td>0.55</td>
       <td>0</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>2</th>
-      <td>is_pos == "0"</td>
-      <td>0.40</td>
-      <td>0.60</td>
+      <td>Survived == 0</td>
+      <td>2</td>
+      <td>0.45</td>
+      <td>0.55</td>
       <td>0</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>3</th>
-      <td>data_source == "optimam" &amp; is_pos == "0"</td>
-      <td>0.40</td>
-      <td>0.60</td>
-      <td>2</td>
+      <td>Survived == 1 &amp; Sex == 'female'</td>
+      <td>3</td>
+      <td>0.49</td>
+      <td>0.51</td>
+      <td>1</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>4</th>
-      <td>data_source == "imh" &amp; is_pos == "0"</td>
-      <td>0.40</td>
-      <td>0.60</td>
+      <td>Survived == 0 &amp; Sex == 'female'</td>
+      <td>4</td>
+      <td>0.49</td>
+      <td>0.51</td>
       <td>2</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>5</th>
-      <td>data_source == "optimam" &amp; is_pos == "1"</td>
-      <td>0.40</td>
-      <td>0.60</td>
+      <td>Survived == 1 &amp; Pclass == 1</td>
+      <td>5</td>
+      <td>0.30</td>
+      <td>0.35</td>
+      <td>1</td>
       <td>1</td>
     </tr>
     <tr>
       <th>6</th>
-      <td>data_source == "imh" &amp; is_pos == "1"</td>
-      <td>0.40</td>
-      <td>0.60</td>
+      <td>Survived == 1 &amp; Pclass == 2</td>
+      <td>6</td>
+      <td>0.30</td>
+      <td>0.35</td>
+      <td>1</td>
       <td>1</td>
     </tr>
     <tr>
       <th>7</th>
-      <td>lesion_type == "mass" &amp; is_pos == "1"</td>
-      <td>0.65</td>
-      <td>0.70</td>
+      <td>Survived == 1 &amp; Pclass == 3</td>
+      <td>7</td>
+      <td>0.30</td>
+      <td>0.35</td>
+      <td>1</td>
       <td>1</td>
     </tr>
     <tr>
       <th>8</th>
-      <td>lesion_type == "calcification" &amp; is_pos == "1"</td>
+      <td>Survived == 0 &amp; Pclass == 1</td>
+      <td>8</td>
       <td>0.30</td>
       <td>0.35</td>
+      <td>2</td>
       <td>1</td>
     </tr>
     <tr>
       <th>9</th>
-      <td>birad == "1" &amp; is_pos == "0"</td>
-      <td>0.75</td>
-      <td>0.80</td>
+      <td>Survived == 0 &amp; Pclass == 2</td>
+      <td>9</td>
+      <td>0.30</td>
+      <td>0.35</td>
       <td>2</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>10</th>
-      <td>birad == "2" &amp; is_pos == "0"</td>
-      <td>0.20</td>
-      <td>0.25</td>
+      <td>Survived == 0 &amp; Pclass == 3</td>
+      <td>10</td>
+      <td>0.30</td>
+      <td>0.35</td>
       <td>2</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>11</th>
-      <td>lesion_type == "mass" &amp; largest_mass&lt;=10</td>
-      <td>0.10</td>
-      <td>0.15</td>
-      <td>7</td>
+      <td>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</td>
+      <td>11</td>
+      <td>0.28</td>
+      <td>0.35</td>
+      <td>8</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>12</th>
-      <td>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; larg...</td>
-      <td>0.50</td>
-      <td>0.60</td>
-      <td>7</td>
+      <td>Age &lt; 20</td>
+      <td>12</td>
+      <td>0.24</td>
+      <td>0.26</td>
+      <td>0</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>13</th>
-      <td>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; larg...</td>
-      <td>0.25</td>
-      <td>0.30</td>
-      <td>7</td>
+      <td>Age &lt; 30 &amp; Age &gt;= 20</td>
+      <td>13</td>
+      <td>0.24</td>
+      <td>0.26</td>
+      <td>0</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>14</th>
-      <td>age&lt;50</td>
-      <td>0.25</td>
-      <td>0.30</td>
+      <td>Age &lt; 40 &amp; Age &gt;= 30</td>
+      <td>14</td>
+      <td>0.24</td>
+      <td>0.26</td>
       <td>0</td>
+      <td>1</td>
     </tr>
     <tr>
       <th>15</th>
-      <td>age&lt;60 &amp; age&gt;=50</td>
-      <td>0.27</td>
-      <td>0.33</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>16</th>
-      <td>age&lt;70 &amp; age&gt;=60</td>
-      <td>0.22</td>
+      <td>Age &gt;= 40</td>
+      <td>15</td>
+      <td>0.24</td>
       <td>0.26</td>
       <td>0</td>
-    </tr>
-    <tr>
-      <th>17</th>
-      <td>age&gt;=70</td>
-      <td>0.15</td>
-      <td>0.20</td>
-      <td>0</td>
+      <td>1</td>
     </tr>
   </tbody>
 </table>
@@ -1074,7 +1075,8 @@ df_cond_rel.reset_index()
 
 
 
-Here, in line 10, we ask that the number of samples satisfying the query [*birad == "2" & is_pos == "0"*] would be at least 20% and no more than 25% of the samples satisfying query 2 [*is_pos == "0"*], as indicated by the column *index_ref*. This is how we were able to define a condition relevant to the negative set without knowing how many negative we'll have at the end!
+Here, *index_ref* column is referencing a previous constraint id.
+For example, in line 4, we ask that the number of samples satisfying the query [*Survived == 0 & Sex == 'female'*] would be at least 49% and no more than 51% of the samples satisfying query 2 [*Survived == 0*]. This is how we were able to define a condition relevant to the negative set without knowing how many negative we'll have at the end!
 
 We still have to ground the solution in some absolute number of desired sample, so we used integer boundaries for the first query above, simply by setting *index_ref=-1* (otherwise the solution is not well defined and the LP solver might not converge).
 
@@ -1086,9 +1088,9 @@ included, summary = cc.run()
 summary
 ```
 
-    Theoretical violations: 1.7763568394002505e-15
-    included: 800
-    actual violations: 0
+    Theoretical penalty: 8.159999999999986
+    Actual penalty: 10   Total violations: 10
+    Included: 200
 
 
 
@@ -1115,6 +1117,7 @@ summary
       <th>cnt</th>
       <th>min</th>
       <th>max</th>
+      <th>total</th>
       <th>violation</th>
     </tr>
     <tr>
@@ -1123,133 +1126,136 @@ summary
       <th></th>
       <th></th>
       <th></th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <th>exists == "1"</th>
-      <td>800</td>
-      <td>800</td>
-      <td>800</td>
+      <th>Survived &gt;= 0</th>
+      <td>200</td>
+      <td>200</td>
+      <td>200</td>
+      <td>887</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>is_pos == "1"</th>
-      <td>395</td>
-      <td>320</td>
-      <td>480</td>
+      <th>Survived == 1</th>
+      <td>110</td>
+      <td>90</td>
+      <td>110</td>
+      <td>342</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>is_pos == "0"</th>
-      <td>405</td>
-      <td>320</td>
-      <td>480</td>
+      <th>Survived == 0</th>
+      <td>90</td>
+      <td>90</td>
+      <td>110</td>
+      <td>545</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>data_source == "optimam" &amp; is_pos == "0"</th>
-      <td>184</td>
-      <td>162</td>
-      <td>243</td>
+      <th>Survived == 1 &amp; Sex == 'female'</th>
+      <td>56</td>
+      <td>54</td>
+      <td>56</td>
+      <td>233</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>data_source == "imh" &amp; is_pos == "0"</th>
-      <td>221</td>
-      <td>162</td>
-      <td>243</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>data_source == "optimam" &amp; is_pos == "1"</th>
-      <td>237</td>
-      <td>158</td>
-      <td>237</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>data_source == "imh" &amp; is_pos == "1"</th>
-      <td>158</td>
-      <td>158</td>
-      <td>237</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>lesion_type == "mass" &amp; is_pos == "1"</th>
-      <td>259</td>
-      <td>257</td>
-      <td>276</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>lesion_type == "calcification" &amp; is_pos == "1"</th>
-      <td>119</td>
-      <td>118</td>
-      <td>138</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>birad == "1" &amp; is_pos == "0"</th>
-      <td>304</td>
-      <td>304</td>
-      <td>324</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>birad == "2" &amp; is_pos == "0"</th>
+      <th>Survived == 0 &amp; Sex == 'female'</th>
+      <td>44</td>
+      <td>44</td>
+      <td>46</td>
       <td>81</td>
-      <td>81</td>
-      <td>101</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&lt;=10</th>
-      <td>29</td>
-      <td>26</td>
+      <th>Survived == 1 &amp; Pclass == 1</th>
+      <td>38</td>
+      <td>33</td>
+      <td>38</td>
+      <td>136</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>Survived == 1 &amp; Pclass == 2</th>
       <td>39</td>
+      <td>33</td>
+      <td>38</td>
+      <td>87</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>Survived == 1 &amp; Pclass == 3</th>
+      <td>33</td>
+      <td>33</td>
+      <td>38</td>
+      <td>119</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&gt;10 &amp; largest_mass&lt;=20</th>
-      <td>155</td>
-      <td>130</td>
-      <td>155</td>
+      <th>Survived == 0 &amp; Pclass == 1</th>
+      <td>27</td>
+      <td>27</td>
+      <td>31</td>
+      <td>80</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>lesion_type == "mass" &amp; largest_mass&gt;20 &amp; largest_mass&lt;=50</th>
-      <td>65</td>
-      <td>65</td>
-      <td>78</td>
+      <th>Survived == 0 &amp; Pclass == 2</th>
+      <td>28</td>
+      <td>27</td>
+      <td>31</td>
+      <td>97</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>age&lt;50</th>
-      <td>200</td>
-      <td>200</td>
-      <td>240</td>
+      <th>Survived == 0 &amp; Pclass == 3</th>
+      <td>35</td>
+      <td>27</td>
+      <td>31</td>
+      <td>368</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
+      <td>3</td>
+      <td>8</td>
+      <td>9</td>
+      <td>3</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <th>Age &lt; 20</th>
+      <td>52</td>
+      <td>48</td>
+      <td>52</td>
+      <td>199</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>age&lt;60 &amp; age&gt;=50</th>
-      <td>264</td>
-      <td>216</td>
-      <td>264</td>
+      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
+      <td>48</td>
+      <td>48</td>
+      <td>52</td>
+      <td>293</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>age&lt;70 &amp; age&gt;=60</th>
-      <td>176</td>
-      <td>176</td>
-      <td>208</td>
+      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
+      <td>52</td>
+      <td>48</td>
+      <td>52</td>
+      <td>199</td>
       <td>0</td>
     </tr>
     <tr>
-      <th>age&gt;=70</th>
-      <td>160</td>
-      <td>120</td>
-      <td>160</td>
+      <th>Age &gt;= 40</th>
+      <td>48</td>
+      <td>48</td>
+      <td>52</td>
+      <td>196</td>
       <td>0</td>
     </tr>
   </tbody>
@@ -1257,5 +1263,3 @@ summary
 </div>
 
 
-
-And we reached an optimal solution! 

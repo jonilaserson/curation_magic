@@ -105,9 +105,9 @@ class Curator(object):
     def decode_solution(self, seed=None):
         """Returns a boolean vector of size n_samples, indicating chosen samples."""
         np.random.seed(seed or 0)
-        x = self.solution.x[:self.n_samples] * self.cnt
+        x = self.solution.x[:self.n_samples].clip(0, 1) * self.cnt
         r = x % 1  # The remainder
-        assert(np.abs(x.astype('int') + r - x).sum() < 1e-9, str(x[:5])+str(r[:5])+str(x[:5].astype('int')))
+        assert(np.abs(x.astype('int') + r - x).sum() < 1e-9)
         if seed is None:
             r = r.round()
         else:
