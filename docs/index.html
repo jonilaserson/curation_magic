@@ -67,8 +67,8 @@ description: "Automagically curate test sets based on user given constraints"
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Load dataframe from file.</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="n">df_samples</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;csvs/titanic.csv&#39;</span><span class="p">)</span>
-<span class="n">df_samples</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">df_samples</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;csvs/titanic.csv&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="s1">&#39;Name&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df_samples</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
 </pre></div>
 
     </div>
@@ -80,97 +80,16 @@ description: "Automagically curate test sets based on user given constraints"
 
 <div class="output_area">
 
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Survived</th>
-      <th>Pclass</th>
-      <th>Name</th>
-      <th>Sex</th>
-      <th>Age</th>
-      <th>Siblings/Spouses Aboard</th>
-      <th>Parents/Children Aboard</th>
-      <th>Fare</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0</td>
-      <td>3</td>
-      <td>Mr. Owen Harris Braund</td>
-      <td>male</td>
-      <td>22.0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>7.2500</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>1</td>
-      <td>Mrs. John Bradley (Florence Briggs Thayer) Cum...</td>
-      <td>female</td>
-      <td>38.0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>71.2833</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1</td>
-      <td>3</td>
-      <td>Miss. Laina Heikkinen</td>
-      <td>female</td>
-      <td>26.0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>7.9250</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1</td>
-      <td>1</td>
-      <td>Mrs. Jacques Heath (Lily May Peel) Futrelle</td>
-      <td>female</td>
-      <td>35.0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>53.1000</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0</td>
-      <td>3</td>
-      <td>Mr. William Henry Allen</td>
-      <td>male</td>
-      <td>35.0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>8.0500</td>
-    </tr>
-  </tbody>
-</table>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>|    |   Survived |   Pclass | Sex    |   Age |   Siblings/Spouses Aboard |   Parents/Children Aboard |    Fare |
+|---:|-----------:|---------:|:-------|------:|--------------------------:|--------------------------:|--------:|
+|  0 |          0 |        3 | male   |    22 |                         1 |                         0 |  7.25   |
+|  1 |          1 |        1 | female |    38 |                         1 |                         0 | 71.2833 |
+|  2 |          1 |        3 | female |    26 |                         0 |                         0 |  7.925  |
+|  3 |          1 |        1 | female |    35 |                         1 |                         0 | 53.1    |
+|  4 |          0 |        3 | male   |    35 |                         0 |                         0 |  8.05   |
+</pre>
 </div>
-</div>
-
 </div>
 
 </div>
@@ -196,7 +115,7 @@ Each row of <em>df_cond_abs</em> is indexed by a <em>query</em> that can be appl
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Get absolute numbers constraints </span>
 <span class="n">df_cond_abs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;csvs/curation_conditions_abs.csv&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">)</span>
-<span class="n">df_cond_abs</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df_cond_abs</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
 </pre></div>
 
     </div>
@@ -208,175 +127,27 @@ Each row of <em>df_cond_abs</em> is indexed by a <em>query</em> that can be appl
 
 <div class="output_area">
 
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>id</th>
-      <th>min</th>
-      <th>max</th>
-      <th>index_ref</th>
-      <th>penalty_per_violation</th>
-    </tr>
-    <tr>
-      <th>query</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Survived &gt;= 0</th>
-      <td>0</td>
-      <td>200</td>
-      <td>200</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1</th>
-      <td>1</td>
-      <td>100</td>
-      <td>100</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0</th>
-      <td>2</td>
-      <td>100</td>
-      <td>100</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Sex == 'female'</th>
-      <td>3</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Sex == 'female'</th>
-      <td>4</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 1</th>
-      <td>5</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 2</th>
-      <td>6</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 3</th>
-      <td>7</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1</th>
-      <td>8</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 2</th>
-      <td>9</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 3</th>
-      <td>10</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
-      <td>11</td>
-      <td>8</td>
-      <td>12</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 20</th>
-      <td>12</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
-      <td>13</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
-      <td>14</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Age &gt;= 40</th>
-      <td>15</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>| query                                         |   id |   min |   max |   index_ref |   penalty_per_violation |
+|:----------------------------------------------|-----:|------:|------:|------------:|------------------------:|
+| Survived &gt;= 0                                 |    0 |   200 |   200 |          -1 |                       1 |
+| Survived == 1                                 |    1 |   100 |   100 |          -1 |                       1 |
+| Survived == 0                                 |    2 |   100 |   100 |          -1 |                       1 |
+| Survived == 1 &amp; Sex == &#39;female&#39;               |    3 |    48 |    52 |          -1 |                       1 |
+| Survived == 0 &amp; Sex == &#39;female&#39;               |    4 |    48 |    52 |          -1 |                       1 |
+| Survived == 1 &amp; Pclass == 1                   |    5 |    30 |    35 |          -1 |                       1 |
+| Survived == 1 &amp; Pclass == 2                   |    6 |    30 |    35 |          -1 |                       1 |
+| Survived == 1 &amp; Pclass == 3                   |    7 |    30 |    35 |          -1 |                       1 |
+| Survived == 0 &amp; Pclass == 1                   |    8 |    30 |    35 |          -1 |                       1 |
+| Survived == 0 &amp; Pclass == 2                   |    9 |    30 |    35 |          -1 |                       1 |
+| Survived == 0 &amp; Pclass == 3                   |   10 |    30 |    35 |          -1 |                       1 |
+| Survived == 0 &amp; Pclass == 1 &amp; Sex == &#39;female&#39; |   11 |     8 |    12 |          -1 |                       1 |
+| Age &lt; 20                                      |   12 |    48 |    52 |          -1 |                       1 |
+| Age &lt; 30 &amp; Age &gt;= 20                          |   13 |    48 |    52 |          -1 |                       1 |
+| Age &lt; 40 &amp; Age &gt;= 30                          |   14 |    48 |    52 |          -1 |                       1 |
+| Age &gt;= 40                                     |   15 |    48 |    52 |          -1 |                       1 |
+</pre>
 </div>
-</div>
-
 </div>
 
 </div>
@@ -400,7 +171,7 @@ Each row of <em>df_cond_abs</em> is indexed by a <em>query</em> that can be appl
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">df_bool</span> <span class="o">=</span> <span class="n">curator</span><span class="o">.</span><span class="n">get_query_features_df</span><span class="p">(</span><span class="n">df_samples</span><span class="p">,</span> <span class="n">df_cond_abs</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-<span class="n">df_bool</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df_bool</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
 </pre></div>
 
     </div>
@@ -412,145 +183,16 @@ Each row of <em>df_cond_abs</em> is indexed by a <em>query</em> that can be appl
 
 <div class="output_area">
 
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Survived &gt;= 0</th>
-      <th>Survived == 1</th>
-      <th>Survived == 0</th>
-      <th>Survived == 1 &amp; Sex == 'female'</th>
-      <th>Survived == 0 &amp; Sex == 'female'</th>
-      <th>Survived == 1 &amp; Pclass == 1</th>
-      <th>Survived == 1 &amp; Pclass == 2</th>
-      <th>Survived == 1 &amp; Pclass == 3</th>
-      <th>Survived == 0 &amp; Pclass == 1</th>
-      <th>Survived == 0 &amp; Pclass == 2</th>
-      <th>Survived == 0 &amp; Pclass == 3</th>
-      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
-      <th>Age &lt; 20</th>
-      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
-      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
-      <th>Age &gt;= 40</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>True</td>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>True</td>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>True</td>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-  </tbody>
-</table>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>|    |   Survived &gt;= 0 |   Survived == 1 |   Survived == 0 |   Survived == 1 &amp; Sex == &#39;female&#39; |   Survived == 0 &amp; Sex == &#39;female&#39; |   Survived == 1 &amp; Pclass == 1 |   Survived == 1 &amp; Pclass == 2 |   Survived == 1 &amp; Pclass == 3 |   Survived == 0 &amp; Pclass == 1 |   Survived == 0 &amp; Pclass == 2 |   Survived == 0 &amp; Pclass == 3 |   Survived == 0 &amp; Pclass == 1 &amp; Sex == &#39;female&#39; |   Age &lt; 20 |   Age &lt; 30 &amp; Age &gt;= 20 |   Age &lt; 40 &amp; Age &gt;= 30 |   Age &gt;= 40 |
+|---:|----------------:|----------------:|----------------:|----------------------------------:|----------------------------------:|------------------------------:|------------------------------:|------------------------------:|------------------------------:|------------------------------:|------------------------------:|------------------------------------------------:|-----------:|-----------------------:|-----------------------:|------------:|
+|  0 |               1 |               0 |               1 |                                 0 |                                 0 |                             0 |                             0 |                             0 |                             0 |                             0 |                             1 |                                               0 |          0 |                      1 |                      0 |           0 |
+|  1 |               1 |               1 |               0 |                                 1 |                                 0 |                             1 |                             0 |                             0 |                             0 |                             0 |                             0 |                                               0 |          0 |                      0 |                      1 |           0 |
+|  2 |               1 |               1 |               0 |                                 1 |                                 0 |                             0 |                             0 |                             1 |                             0 |                             0 |                             0 |                                               0 |          0 |                      1 |                      0 |           0 |
+|  3 |               1 |               1 |               0 |                                 1 |                                 0 |                             1 |                             0 |                             0 |                             0 |                             0 |                             0 |                                               0 |          0 |                      0 |                      1 |           0 |
+|  4 |               1 |               0 |               1 |                                 0 |                                 0 |                             0 |                             0 |                             0 |                             0 |                             0 |                             1 |                                               0 |          0 |                      0 |                      1 |           0 |
+</pre>
 </div>
-</div>
-
 </div>
 
 </div>
@@ -637,7 +279,7 @@ dtype: int64</pre>
 
 <span class="c1"># The summary shows how many were included from every query,</span>
 <span class="c1"># and the total number of violations.</span>
-<span class="n">summary</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
 </pre></div>
 
     </div>
@@ -649,198 +291,30 @@ dtype: int64</pre>
 
 <div class="output_area">
 
-<div class="output_subarea output_stream output_stderr output_text">
-<pre>/cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option &#39;cholesky&#39;:True failed. It is normal for this to happen occasionally, especially as the solution is approached. However, if you see this frequently, consider setting option &#39;cholesky&#39; to False.
-  self.solution = linprog(method=method, **self.linprog_params)
-/cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option &#39;sym_pos&#39;:True failed. It is normal for this to happen occasionally, especially as the solution is approached. However, if you see this frequently, consider setting option &#39;sym_pos&#39; to False.
-  self.solution = linprog(method=method, **self.linprog_params)
-/cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option &#39;sym_pos&#39;:False failed. This may happen occasionally, especially as the solution is approached. However, if you see this frequently, your problem may be numerically challenging. If you cannot improve the formulation, consider setting &#39;lstsq&#39; to True. Consider also setting `presolve` to True, if it is not already.
-  self.solution = linprog(method=method, **self.linprog_params)
-</pre>
-</div>
-</div>
-
-<div class="output_area">
-
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Theoretical penalty: 8.999999999971957
-Actual penalty: 9   Total violations: 9
-Included: 200
+<pre>Theoretical penalty: 8.99999970164261
+Actual penalty: 13   Total violations: 13
+Included: 198
+| query                                         |   cnt |   min |   max |   total |   violation |
+|:----------------------------------------------|------:|------:|------:|--------:|------------:|
+| Survived &gt;= 0                                 |   198 |   200 |   200 |     887 |           2 |
+| Survived == 1                                 |    99 |   100 |   100 |     342 |           1 |
+| Survived == 0                                 |    99 |   100 |   100 |     545 |           1 |
+| Survived == 1 &amp; Sex == &#39;female&#39;               |    49 |    48 |    52 |     233 |           0 |
+| Survived == 0 &amp; Sex == &#39;female&#39;               |    44 |    48 |    52 |      81 |           4 |
+| Survived == 1 &amp; Pclass == 1                   |    33 |    30 |    35 |     136 |           0 |
+| Survived == 1 &amp; Pclass == 2                   |    33 |    30 |    35 |      87 |           0 |
+| Survived == 1 &amp; Pclass == 3                   |    33 |    30 |    35 |     119 |           0 |
+| Survived == 0 &amp; Pclass == 1                   |    32 |    30 |    35 |      80 |           0 |
+| Survived == 0 &amp; Pclass == 2                   |    32 |    30 |    35 |      97 |           0 |
+| Survived == 0 &amp; Pclass == 3                   |    35 |    30 |    35 |     368 |           0 |
+| Survived == 0 &amp; Pclass == 1 &amp; Sex == &#39;female&#39; |     3 |     8 |    12 |       3 |           5 |
+| Age &lt; 20                                      |    50 |    48 |    52 |     199 |           0 |
+| Age &lt; 30 &amp; Age &gt;= 20                          |    50 |    48 |    52 |     293 |           0 |
+| Age &lt; 40 &amp; Age &gt;= 30                          |    49 |    48 |    52 |     199 |           0 |
+| Age &gt;= 40                                     |    49 |    48 |    52 |     196 |           0 |
 </pre>
 </div>
-</div>
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cnt</th>
-      <th>min</th>
-      <th>max</th>
-      <th>total</th>
-      <th>violation</th>
-    </tr>
-    <tr>
-      <th>query</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Survived &gt;= 0</th>
-      <td>200</td>
-      <td>200</td>
-      <td>200</td>
-      <td>887</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1</th>
-      <td>100</td>
-      <td>100</td>
-      <td>100</td>
-      <td>342</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0</th>
-      <td>100</td>
-      <td>100</td>
-      <td>100</td>
-      <td>545</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Sex == 'female'</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>233</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Sex == 'female'</th>
-      <td>48</td>
-      <td>48</td>
-      <td>52</td>
-      <td>81</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 1</th>
-      <td>33</td>
-      <td>30</td>
-      <td>35</td>
-      <td>136</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 2</th>
-      <td>34</td>
-      <td>30</td>
-      <td>35</td>
-      <td>87</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 3</th>
-      <td>33</td>
-      <td>30</td>
-      <td>35</td>
-      <td>119</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1</th>
-      <td>30</td>
-      <td>30</td>
-      <td>35</td>
-      <td>80</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 2</th>
-      <td>31</td>
-      <td>30</td>
-      <td>35</td>
-      <td>97</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 3</th>
-      <td>39</td>
-      <td>30</td>
-      <td>35</td>
-      <td>368</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
-      <td>3</td>
-      <td>8</td>
-      <td>12</td>
-      <td>3</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 20</th>
-      <td>49</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>293</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
-      <td>51</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &gt;= 40</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>196</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
 </div>
 
 </div>
@@ -878,7 +352,7 @@ We can tweak the optimization by giving a larger penalty for each violation of t
 <span class="n">cc</span> <span class="o">=</span> <span class="n">curator</span><span class="o">.</span><span class="n">AbsBoundariesCurator</span><span class="p">(</span><span class="n">df_samples</span><span class="p">,</span> <span class="n">df_cond_abs</span><span class="p">)</span>
 <span class="n">included</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;interior-point&#39;</span><span class="p">)</span>
 
-<span class="n">summary</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
 </pre></div>
 
     </div>
@@ -890,185 +364,43 @@ We can tweak the optimization by giving a larger penalty for each violation of t
 
 <div class="output_area">
 
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Theoretical penalty: 8.999999999971957
-Actual penalty: 9   Total violations: 9
-Included: 200
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option &#39;cholesky&#39;:True failed. It is normal for this to happen occasionally, especially as the solution is approached. However, if you see this frequently, consider setting option &#39;cholesky&#39; to False.
+  self.solution = linprog(method=method, **self.linprog_params)
+/cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option &#39;sym_pos&#39;:True failed. It is normal for this to happen occasionally, especially as the solution is approached. However, if you see this frequently, consider setting option &#39;sym_pos&#39; to False.
+  self.solution = linprog(method=method, **self.linprog_params)
+/cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option &#39;sym_pos&#39;:False failed. This may happen occasionally, especially as the solution is approached. However, if you see this frequently, your problem may be numerically challenging. If you cannot improve the formulation, consider setting &#39;lstsq&#39; to True. Consider also setting `presolve` to True, if it is not already.
+  self.solution = linprog(method=method, **self.linprog_params)
 </pre>
 </div>
 </div>
 
 <div class="output_area">
 
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cnt</th>
-      <th>min</th>
-      <th>max</th>
-      <th>total</th>
-      <th>violation</th>
-    </tr>
-    <tr>
-      <th>query</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Survived &gt;= 0</th>
-      <td>200</td>
-      <td>200</td>
-      <td>200</td>
-      <td>887</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1</th>
-      <td>100</td>
-      <td>100</td>
-      <td>100</td>
-      <td>342</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0</th>
-      <td>100</td>
-      <td>100</td>
-      <td>100</td>
-      <td>545</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Sex == 'female'</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>233</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Sex == 'female'</th>
-      <td>48</td>
-      <td>48</td>
-      <td>52</td>
-      <td>81</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 1</th>
-      <td>33</td>
-      <td>30</td>
-      <td>35</td>
-      <td>136</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 2</th>
-      <td>34</td>
-      <td>30</td>
-      <td>35</td>
-      <td>87</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 3</th>
-      <td>33</td>
-      <td>30</td>
-      <td>35</td>
-      <td>119</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1</th>
-      <td>30</td>
-      <td>30</td>
-      <td>35</td>
-      <td>80</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 2</th>
-      <td>31</td>
-      <td>30</td>
-      <td>35</td>
-      <td>97</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 3</th>
-      <td>39</td>
-      <td>30</td>
-      <td>35</td>
-      <td>368</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
-      <td>3</td>
-      <td>8</td>
-      <td>12</td>
-      <td>3</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 20</th>
-      <td>49</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>293</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
-      <td>51</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &gt;= 40</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>196</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Theoretical penalty: 8.999999999971957
+Actual penalty: 9   Total violations: 9
+Included: 200
+| query                                         |   cnt |   min |   max |   total |   violation |
+|:----------------------------------------------|------:|------:|------:|--------:|------------:|
+| Survived &gt;= 0                                 |   200 |   200 |   200 |     887 |           0 |
+| Survived == 1                                 |   100 |   100 |   100 |     342 |           0 |
+| Survived == 0                                 |   100 |   100 |   100 |     545 |           0 |
+| Survived == 1 &amp; Sex == &#39;female&#39;               |    50 |    48 |    52 |     233 |           0 |
+| Survived == 0 &amp; Sex == &#39;female&#39;               |    48 |    48 |    52 |      81 |           0 |
+| Survived == 1 &amp; Pclass == 1                   |    33 |    30 |    35 |     136 |           0 |
+| Survived == 1 &amp; Pclass == 2                   |    34 |    30 |    35 |      87 |           0 |
+| Survived == 1 &amp; Pclass == 3                   |    33 |    30 |    35 |     119 |           0 |
+| Survived == 0 &amp; Pclass == 1                   |    30 |    30 |    35 |      80 |           0 |
+| Survived == 0 &amp; Pclass == 2                   |    31 |    30 |    35 |      97 |           0 |
+| Survived == 0 &amp; Pclass == 3                   |    39 |    30 |    35 |     368 |           4 |
+| Survived == 0 &amp; Pclass == 1 &amp; Sex == &#39;female&#39; |     3 |     8 |    12 |       3 |           5 |
+| Age &lt; 20                                      |    49 |    48 |    52 |     199 |           0 |
+| Age &lt; 30 &amp; Age &gt;= 20                          |    50 |    48 |    52 |     293 |           0 |
+| Age &lt; 40 &amp; Age &gt;= 30                          |    51 |    48 |    52 |     199 |           0 |
+| Age &gt;= 40                                     |    50 |    48 |    52 |     196 |           0 |
+</pre>
 </div>
-</div>
-
 </div>
 
 </div>
@@ -1141,7 +473,7 @@ Say we are willing to have some flexibility with regard to the number of negativ
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Get relative fraction constraints</span>
 <span class="n">df_cond_rel</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;csvs/curation_conditions_rel.csv&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">)</span>
-<span class="n">df_cond_rel</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df_cond_rel</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
 </pre></div>
 
     </div>
@@ -1153,184 +485,27 @@ Say we are willing to have some flexibility with regard to the number of negativ
 
 <div class="output_area">
 
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>query</th>
-      <th>id</th>
-      <th>min</th>
-      <th>max</th>
-      <th>index_ref</th>
-      <th>penalty_per_violation</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Survived &gt;= 0</td>
-      <td>0</td>
-      <td>200.00</td>
-      <td>200.00</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Survived == 1</td>
-      <td>1</td>
-      <td>0.45</td>
-      <td>0.55</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Survived == 0</td>
-      <td>2</td>
-      <td>0.45</td>
-      <td>0.55</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Survived == 1 &amp; Sex == 'female'</td>
-      <td>3</td>
-      <td>0.49</td>
-      <td>0.51</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Survived == 0 &amp; Sex == 'female'</td>
-      <td>4</td>
-      <td>0.49</td>
-      <td>0.51</td>
-      <td>2</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>Survived == 1 &amp; Pclass == 1</td>
-      <td>5</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>Survived == 1 &amp; Pclass == 2</td>
-      <td>6</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>Survived == 1 &amp; Pclass == 3</td>
-      <td>7</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>Survived == 0 &amp; Pclass == 1</td>
-      <td>8</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>2</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>Survived == 0 &amp; Pclass == 2</td>
-      <td>9</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>2</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>Survived == 0 &amp; Pclass == 3</td>
-      <td>10</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>2</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</td>
-      <td>11</td>
-      <td>0.28</td>
-      <td>0.35</td>
-      <td>8</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>Age &lt; 20</td>
-      <td>12</td>
-      <td>0.24</td>
-      <td>0.26</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>Age &lt; 30 &amp; Age &gt;= 20</td>
-      <td>13</td>
-      <td>0.24</td>
-      <td>0.26</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>Age &lt; 40 &amp; Age &gt;= 30</td>
-      <td>14</td>
-      <td>0.24</td>
-      <td>0.26</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>Age &gt;= 40</td>
-      <td>15</td>
-      <td>0.24</td>
-      <td>0.26</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>|    | query                                         |   id |    min |    max |   index_ref |   penalty_per_violation |
+|---:|:----------------------------------------------|-----:|-------:|-------:|------------:|------------------------:|
+|  0 | Survived &gt;= 0                                 |    0 | 200    | 200    |          -1 |                       1 |
+|  1 | Survived == 1                                 |    1 |   0.45 |   0.55 |           0 |                       1 |
+|  2 | Survived == 0                                 |    2 |   0.45 |   0.55 |           0 |                       1 |
+|  3 | Survived == 1 &amp; Sex == &#39;female&#39;               |    3 |   0.49 |   0.51 |           1 |                       1 |
+|  4 | Survived == 0 &amp; Sex == &#39;female&#39;               |    4 |   0.49 |   0.51 |           2 |                       1 |
+|  5 | Survived == 1 &amp; Pclass == 1                   |    5 |   0.3  |   0.35 |           1 |                       1 |
+|  6 | Survived == 1 &amp; Pclass == 2                   |    6 |   0.3  |   0.35 |           1 |                       1 |
+|  7 | Survived == 1 &amp; Pclass == 3                   |    7 |   0.3  |   0.35 |           1 |                       1 |
+|  8 | Survived == 0 &amp; Pclass == 1                   |    8 |   0.3  |   0.35 |           2 |                       1 |
+|  9 | Survived == 0 &amp; Pclass == 2                   |    9 |   0.3  |   0.35 |           2 |                       1 |
+| 10 | Survived == 0 &amp; Pclass == 3                   |   10 |   0.3  |   0.35 |           2 |                       1 |
+| 11 | Survived == 0 &amp; Pclass == 1 &amp; Sex == &#39;female&#39; |   11 |   0.28 |   0.35 |           8 |                       1 |
+| 12 | Age &lt; 20                                      |   12 |   0.24 |   0.26 |           0 |                       1 |
+| 13 | Age &lt; 30 &amp; Age &gt;= 20                          |   13 |   0.24 |   0.26 |           0 |                       1 |
+| 14 | Age &lt; 40 &amp; Age &gt;= 30                          |   14 |   0.24 |   0.26 |           0 |                       1 |
+| 15 | Age &gt;= 40                                     |   15 |   0.24 |   0.26 |           0 |                       1 |
+</pre>
 </div>
-</div>
-
 </div>
 
 </div>
@@ -1358,7 +533,7 @@ For example, in line 4, we ask that the number of samples satisfying the query [
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">cc</span> <span class="o">=</span> <span class="n">curator</span><span class="o">.</span><span class="n">RelBoundariesCurator</span><span class="p">(</span><span class="n">df_samples</span><span class="p">,</span> <span class="n">df_cond_rel</span><span class="p">)</span>
 <span class="n">included</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">cc</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-<span class="n">summary</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">())</span>
 </pre></div>
 
     </div>
@@ -1371,184 +546,29 @@ For example, in line 4, we ask that the number of samples satisfying the query [
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Theoretical penalty: 8.159999999999986
+<pre>Theoretical penalty: 8.160000000000009
 Actual penalty: 10   Total violations: 10
 Included: 200
+| query                                         |   cnt |   min |   max |   total |   violation |
+|:----------------------------------------------|------:|------:|------:|--------:|------------:|
+| Survived &gt;= 0                                 |   200 |   200 |   200 |     887 |           0 |
+| Survived == 1                                 |   110 |    90 |   110 |     342 |           0 |
+| Survived == 0                                 |    90 |    90 |   110 |     545 |           0 |
+| Survived == 1 &amp; Sex == &#39;female&#39;               |    56 |    54 |    56 |     233 |           0 |
+| Survived == 0 &amp; Sex == &#39;female&#39;               |    44 |    44 |    46 |      81 |           0 |
+| Survived == 1 &amp; Pclass == 1                   |    38 |    33 |    38 |     136 |           0 |
+| Survived == 1 &amp; Pclass == 2                   |    39 |    33 |    38 |      87 |           1 |
+| Survived == 1 &amp; Pclass == 3                   |    33 |    33 |    38 |     119 |           0 |
+| Survived == 0 &amp; Pclass == 1                   |    27 |    27 |    31 |      80 |           0 |
+| Survived == 0 &amp; Pclass == 2                   |    28 |    27 |    31 |      97 |           0 |
+| Survived == 0 &amp; Pclass == 3                   |    35 |    27 |    31 |     368 |           4 |
+| Survived == 0 &amp; Pclass == 1 &amp; Sex == &#39;female&#39; |     3 |     8 |     9 |       3 |           5 |
+| Age &lt; 20                                      |    52 |    48 |    52 |     199 |           0 |
+| Age &lt; 30 &amp; Age &gt;= 20                          |    48 |    48 |    52 |     293 |           0 |
+| Age &lt; 40 &amp; Age &gt;= 30                          |    52 |    48 |    52 |     199 |           0 |
+| Age &gt;= 40                                     |    48 |    48 |    52 |     196 |           0 |
 </pre>
 </div>
-</div>
-
-<div class="output_area">
-
-
-<div class="output_html rendered_html output_subarea output_execute_result">
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cnt</th>
-      <th>min</th>
-      <th>max</th>
-      <th>total</th>
-      <th>violation</th>
-    </tr>
-    <tr>
-      <th>query</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Survived &gt;= 0</th>
-      <td>200</td>
-      <td>200</td>
-      <td>200</td>
-      <td>887</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1</th>
-      <td>110</td>
-      <td>90</td>
-      <td>110</td>
-      <td>342</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0</th>
-      <td>90</td>
-      <td>90</td>
-      <td>110</td>
-      <td>545</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Sex == 'female'</th>
-      <td>56</td>
-      <td>54</td>
-      <td>56</td>
-      <td>233</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Sex == 'female'</th>
-      <td>44</td>
-      <td>44</td>
-      <td>46</td>
-      <td>81</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 1</th>
-      <td>38</td>
-      <td>33</td>
-      <td>38</td>
-      <td>136</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 2</th>
-      <td>39</td>
-      <td>33</td>
-      <td>38</td>
-      <td>87</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 3</th>
-      <td>33</td>
-      <td>33</td>
-      <td>38</td>
-      <td>119</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1</th>
-      <td>27</td>
-      <td>27</td>
-      <td>31</td>
-      <td>80</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 2</th>
-      <td>28</td>
-      <td>27</td>
-      <td>31</td>
-      <td>97</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 3</th>
-      <td>35</td>
-      <td>27</td>
-      <td>31</td>
-      <td>368</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
-      <td>3</td>
-      <td>8</td>
-      <td>9</td>
-      <td>3</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 20</th>
-      <td>52</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
-      <td>48</td>
-      <td>48</td>
-      <td>52</td>
-      <td>293</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
-      <td>52</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &gt;= 40</th>
-      <td>48</td>
-      <td>48</td>
-      <td>52</td>
-      <td>196</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-</div>
-
 </div>
 
 </div>

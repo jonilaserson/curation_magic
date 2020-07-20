@@ -21,101 +21,17 @@ Let's see an example, where our general pool is the list of passengers on board 
 # Load dataframe from file.
 import pandas as pd
 
-df_samples = pd.read_csv('csvs/titanic.csv')
-df_samples.head()
+df_samples = pd.read_csv('csvs/titanic.csv').drop(columns='Name')
+print(df_samples.head().to_markdown())
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Survived</th>
-      <th>Pclass</th>
-      <th>Name</th>
-      <th>Sex</th>
-      <th>Age</th>
-      <th>Siblings/Spouses Aboard</th>
-      <th>Parents/Children Aboard</th>
-      <th>Fare</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0</td>
-      <td>3</td>
-      <td>Mr. Owen Harris Braund</td>
-      <td>male</td>
-      <td>22.0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>7.2500</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>1</td>
-      <td>1</td>
-      <td>Mrs. John Bradley (Florence Briggs Thayer) Cum...</td>
-      <td>female</td>
-      <td>38.0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>71.2833</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>1</td>
-      <td>3</td>
-      <td>Miss. Laina Heikkinen</td>
-      <td>female</td>
-      <td>26.0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>7.9250</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>1</td>
-      <td>1</td>
-      <td>Mrs. Jacques Heath (Lily May Peel) Futrelle</td>
-      <td>female</td>
-      <td>35.0</td>
-      <td>1</td>
-      <td>0</td>
-      <td>53.1000</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0</td>
-      <td>3</td>
-      <td>Mr. William Henry Allen</td>
-      <td>male</td>
-      <td>35.0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>8.0500</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
+    |    |   Survived |   Pclass | Sex    |   Age |   Siblings/Spouses Aboard |   Parents/Children Aboard |    Fare |
+    |---:|-----------:|---------:|:-------|------:|--------------------------:|--------------------------:|--------:|
+    |  0 |          0 |        3 | male   |    22 |                         1 |                         0 |  7.25   |
+    |  1 |          1 |        1 | female |    38 |                         1 |                         0 | 71.2833 |
+    |  2 |          1 |        3 | female |    26 |                         0 |                         0 |  7.925  |
+    |  3 |          1 |        1 | female |    35 |                         1 |                         0 | 53.1    |
+    |  4 |          0 |        3 | male   |    35 |                         0 |                         0 |  8.05   |
 
 
 The conditions are given in a second dataframe, *df_cond_abs*. 
@@ -124,326 +40,43 @@ Each row of *df_cond_abs* is indexed by a *query* that can be applied to the df_
 ```python
 # Get absolute numbers constraints 
 df_cond_abs = pd.read_csv('csvs/curation_conditions_abs.csv').set_index('query')
-df_cond_abs
+print(df_cond_abs.to_markdown())
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>id</th>
-      <th>min</th>
-      <th>max</th>
-      <th>index_ref</th>
-      <th>penalty_per_violation</th>
-    </tr>
-    <tr>
-      <th>query</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Survived &gt;= 0</th>
-      <td>0</td>
-      <td>200</td>
-      <td>200</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1</th>
-      <td>1</td>
-      <td>100</td>
-      <td>100</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0</th>
-      <td>2</td>
-      <td>100</td>
-      <td>100</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Sex == 'female'</th>
-      <td>3</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Sex == 'female'</th>
-      <td>4</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 1</th>
-      <td>5</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 2</th>
-      <td>6</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 3</th>
-      <td>7</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1</th>
-      <td>8</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 2</th>
-      <td>9</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 3</th>
-      <td>10</td>
-      <td>30</td>
-      <td>35</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
-      <td>11</td>
-      <td>8</td>
-      <td>12</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 20</th>
-      <td>12</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
-      <td>13</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
-      <td>14</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Age &gt;= 40</th>
-      <td>15</td>
-      <td>48</td>
-      <td>52</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
+    | query                                         |   id |   min |   max |   index_ref |   penalty_per_violation |
+    |:----------------------------------------------|-----:|------:|------:|------------:|------------------------:|
+    | Survived >= 0                                 |    0 |   200 |   200 |          -1 |                       1 |
+    | Survived == 1                                 |    1 |   100 |   100 |          -1 |                       1 |
+    | Survived == 0                                 |    2 |   100 |   100 |          -1 |                       1 |
+    | Survived == 1 & Sex == 'female'               |    3 |    48 |    52 |          -1 |                       1 |
+    | Survived == 0 & Sex == 'female'               |    4 |    48 |    52 |          -1 |                       1 |
+    | Survived == 1 & Pclass == 1                   |    5 |    30 |    35 |          -1 |                       1 |
+    | Survived == 1 & Pclass == 2                   |    6 |    30 |    35 |          -1 |                       1 |
+    | Survived == 1 & Pclass == 3                   |    7 |    30 |    35 |          -1 |                       1 |
+    | Survived == 0 & Pclass == 1                   |    8 |    30 |    35 |          -1 |                       1 |
+    | Survived == 0 & Pclass == 2                   |    9 |    30 |    35 |          -1 |                       1 |
+    | Survived == 0 & Pclass == 3                   |   10 |    30 |    35 |          -1 |                       1 |
+    | Survived == 0 & Pclass == 1 & Sex == 'female' |   11 |     8 |    12 |          -1 |                       1 |
+    | Age < 20                                      |   12 |    48 |    52 |          -1 |                       1 |
+    | Age < 30 & Age >= 20                          |   13 |    48 |    52 |          -1 |                       1 |
+    | Age < 40 & Age >= 30                          |   14 |    48 |    52 |          -1 |                       1 |
+    | Age >= 40                                     |   15 |    48 |    52 |          -1 |                       1 |
 
 
 The function *get_query_features_df* applies all the queries on the *df_samples* dataframe, and we obtain df_bool, a boolean dataframe which has the samples as rows and the queries as columns. *df_bool* indicates which sample matches which query.
 
 ```python
 df_bool = curator.get_query_features_df(df_samples, df_cond_abs.index)
-df_bool.head()
+print(df_bool.head().to_markdown())
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Survived &gt;= 0</th>
-      <th>Survived == 1</th>
-      <th>Survived == 0</th>
-      <th>Survived == 1 &amp; Sex == 'female'</th>
-      <th>Survived == 0 &amp; Sex == 'female'</th>
-      <th>Survived == 1 &amp; Pclass == 1</th>
-      <th>Survived == 1 &amp; Pclass == 2</th>
-      <th>Survived == 1 &amp; Pclass == 3</th>
-      <th>Survived == 0 &amp; Pclass == 1</th>
-      <th>Survived == 0 &amp; Pclass == 2</th>
-      <th>Survived == 0 &amp; Pclass == 3</th>
-      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
-      <th>Age &lt; 20</th>
-      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
-      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
-      <th>Age &gt;= 40</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>True</td>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>True</td>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>True</td>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>True</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-      <td>False</td>
-      <td>False</td>
-      <td>True</td>
-      <td>False</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
+    |    |   Survived >= 0 |   Survived == 1 |   Survived == 0 |   Survived == 1 & Sex == 'female' |   Survived == 0 & Sex == 'female' |   Survived == 1 & Pclass == 1 |   Survived == 1 & Pclass == 2 |   Survived == 1 & Pclass == 3 |   Survived == 0 & Pclass == 1 |   Survived == 0 & Pclass == 2 |   Survived == 0 & Pclass == 3 |   Survived == 0 & Pclass == 1 & Sex == 'female' |   Age < 20 |   Age < 30 & Age >= 20 |   Age < 40 & Age >= 30 |   Age >= 40 |
+    |---:|----------------:|----------------:|----------------:|----------------------------------:|----------------------------------:|------------------------------:|------------------------------:|------------------------------:|------------------------------:|------------------------------:|------------------------------:|------------------------------------------------:|-----------:|-----------------------:|-----------------------:|------------:|
+    |  0 |               1 |               0 |               1 |                                 0 |                                 0 |                             0 |                             0 |                             0 |                             0 |                             0 |                             1 |                                               0 |          0 |                      1 |                      0 |           0 |
+    |  1 |               1 |               1 |               0 |                                 1 |                                 0 |                             1 |                             0 |                             0 |                             0 |                             0 |                             0 |                                               0 |          0 |                      0 |                      1 |           0 |
+    |  2 |               1 |               1 |               0 |                                 1 |                                 0 |                             0 |                             0 |                             1 |                             0 |                             0 |                             0 |                                               0 |          0 |                      1 |                      0 |           0 |
+    |  3 |               1 |               1 |               0 |                                 1 |                                 0 |                             1 |                             0 |                             0 |                             0 |                             0 |                             0 |                                               0 |          0 |                      0 |                      1 |           0 |
+    |  4 |               1 |               0 |               1 |                                 0 |                                 0 |                             0 |                             0 |                             0 |                             0 |                             0 |                             1 |                                               0 |          0 |                      0 |                      1 |           0 |
 
 
 We can use this table to quickly see how many samples in our pool satisfy each query:
@@ -487,191 +120,30 @@ included, summary = abc.run(method='interior-point')
 
 # The summary shows how many were included from every query,
 # and the total number of violations.
-summary
+print(summary.to_markdown())
 ```
 
-    /cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option 'cholesky':True failed. It is normal for this to happen occasionally, especially as the solution is approached. However, if you see this frequently, consider setting option 'cholesky' to False.
-      self.solution = linprog(method=method, **self.linprog_params)
-    /cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option 'sym_pos':True failed. It is normal for this to happen occasionally, especially as the solution is approached. However, if you see this frequently, consider setting option 'sym_pos' to False.
-      self.solution = linprog(method=method, **self.linprog_params)
-    /cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option 'sym_pos':False failed. This may happen occasionally, especially as the solution is approached. However, if you see this frequently, your problem may be numerically challenging. If you cannot improve the formulation, consider setting 'lstsq' to True. Consider also setting `presolve` to True, if it is not already.
-      self.solution = linprog(method=method, **self.linprog_params)
-
-
-    Theoretical penalty: 8.999999999971957
-    Actual penalty: 9   Total violations: 9
-    Included: 200
-
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cnt</th>
-      <th>min</th>
-      <th>max</th>
-      <th>total</th>
-      <th>violation</th>
-    </tr>
-    <tr>
-      <th>query</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Survived &gt;= 0</th>
-      <td>200</td>
-      <td>200</td>
-      <td>200</td>
-      <td>887</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1</th>
-      <td>100</td>
-      <td>100</td>
-      <td>100</td>
-      <td>342</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0</th>
-      <td>100</td>
-      <td>100</td>
-      <td>100</td>
-      <td>545</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Sex == 'female'</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>233</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Sex == 'female'</th>
-      <td>48</td>
-      <td>48</td>
-      <td>52</td>
-      <td>81</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 1</th>
-      <td>33</td>
-      <td>30</td>
-      <td>35</td>
-      <td>136</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 2</th>
-      <td>34</td>
-      <td>30</td>
-      <td>35</td>
-      <td>87</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 3</th>
-      <td>33</td>
-      <td>30</td>
-      <td>35</td>
-      <td>119</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1</th>
-      <td>30</td>
-      <td>30</td>
-      <td>35</td>
-      <td>80</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 2</th>
-      <td>31</td>
-      <td>30</td>
-      <td>35</td>
-      <td>97</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 3</th>
-      <td>39</td>
-      <td>30</td>
-      <td>35</td>
-      <td>368</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
-      <td>3</td>
-      <td>8</td>
-      <td>12</td>
-      <td>3</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 20</th>
-      <td>49</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>293</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
-      <td>51</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &gt;= 40</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>196</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
+    Theoretical penalty: 8.99999970164261
+    Actual penalty: 13   Total violations: 13
+    Included: 198
+    | query                                         |   cnt |   min |   max |   total |   violation |
+    |:----------------------------------------------|------:|------:|------:|--------:|------------:|
+    | Survived >= 0                                 |   198 |   200 |   200 |     887 |           2 |
+    | Survived == 1                                 |    99 |   100 |   100 |     342 |           1 |
+    | Survived == 0                                 |    99 |   100 |   100 |     545 |           1 |
+    | Survived == 1 & Sex == 'female'               |    49 |    48 |    52 |     233 |           0 |
+    | Survived == 0 & Sex == 'female'               |    44 |    48 |    52 |      81 |           4 |
+    | Survived == 1 & Pclass == 1                   |    33 |    30 |    35 |     136 |           0 |
+    | Survived == 1 & Pclass == 2                   |    33 |    30 |    35 |      87 |           0 |
+    | Survived == 1 & Pclass == 3                   |    33 |    30 |    35 |     119 |           0 |
+    | Survived == 0 & Pclass == 1                   |    32 |    30 |    35 |      80 |           0 |
+    | Survived == 0 & Pclass == 2                   |    32 |    30 |    35 |      97 |           0 |
+    | Survived == 0 & Pclass == 3                   |    35 |    30 |    35 |     368 |           0 |
+    | Survived == 0 & Pclass == 1 & Sex == 'female' |     3 |     8 |    12 |       3 |           5 |
+    | Age < 20                                      |    50 |    48 |    52 |     199 |           0 |
+    | Age < 30 & Age >= 20                          |    50 |    48 |    52 |     293 |           0 |
+    | Age < 40 & Age >= 30                          |    49 |    48 |    52 |     199 |           0 |
+    | Age >= 40                                     |    49 |    48 |    52 |     196 |           0 |
 
 
 As you can see above, the linear solver had 9 violations, but after we decoded the solution (round the $x_j$ values and decide which samples to include), there were 13 violations in total. The optimal LP target value is always going to be a lower bound on the *integer* progam target.  
@@ -689,183 +161,38 @@ df_cond_abs.loc["Survived == 0 & Sex == 'female'", 'penalty_per_violation'] = 5
 cc = curator.AbsBoundariesCurator(df_samples, df_cond_abs)
 included, summary = cc.run(method='interior-point')
 
-summary
+print(summary.to_markdown())
 ```
+
+    /cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option 'cholesky':True failed. It is normal for this to happen occasionally, especially as the solution is approached. However, if you see this frequently, consider setting option 'cholesky' to False.
+      self.solution = linprog(method=method, **self.linprog_params)
+    /cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option 'sym_pos':True failed. It is normal for this to happen occasionally, especially as the solution is approached. However, if you see this frequently, consider setting option 'sym_pos' to False.
+      self.solution = linprog(method=method, **self.linprog_params)
+    /cached_data/projects/mammo_v2/jonil/code/curation_magic/curation_magic/curator.py:153: OptimizeWarning: Solving system with option 'sym_pos':False failed. This may happen occasionally, especially as the solution is approached. However, if you see this frequently, your problem may be numerically challenging. If you cannot improve the formulation, consider setting 'lstsq' to True. Consider also setting `presolve` to True, if it is not already.
+      self.solution = linprog(method=method, **self.linprog_params)
+
 
     Theoretical penalty: 8.999999999971957
     Actual penalty: 9   Total violations: 9
     Included: 200
-
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cnt</th>
-      <th>min</th>
-      <th>max</th>
-      <th>total</th>
-      <th>violation</th>
-    </tr>
-    <tr>
-      <th>query</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Survived &gt;= 0</th>
-      <td>200</td>
-      <td>200</td>
-      <td>200</td>
-      <td>887</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1</th>
-      <td>100</td>
-      <td>100</td>
-      <td>100</td>
-      <td>342</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0</th>
-      <td>100</td>
-      <td>100</td>
-      <td>100</td>
-      <td>545</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Sex == 'female'</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>233</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Sex == 'female'</th>
-      <td>48</td>
-      <td>48</td>
-      <td>52</td>
-      <td>81</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 1</th>
-      <td>33</td>
-      <td>30</td>
-      <td>35</td>
-      <td>136</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 2</th>
-      <td>34</td>
-      <td>30</td>
-      <td>35</td>
-      <td>87</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 3</th>
-      <td>33</td>
-      <td>30</td>
-      <td>35</td>
-      <td>119</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1</th>
-      <td>30</td>
-      <td>30</td>
-      <td>35</td>
-      <td>80</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 2</th>
-      <td>31</td>
-      <td>30</td>
-      <td>35</td>
-      <td>97</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 3</th>
-      <td>39</td>
-      <td>30</td>
-      <td>35</td>
-      <td>368</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
-      <td>3</td>
-      <td>8</td>
-      <td>12</td>
-      <td>3</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 20</th>
-      <td>49</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>293</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
-      <td>51</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &gt;= 40</th>
-      <td>50</td>
-      <td>48</td>
-      <td>52</td>
-      <td>196</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
+    | query                                         |   cnt |   min |   max |   total |   violation |
+    |:----------------------------------------------|------:|------:|------:|--------:|------------:|
+    | Survived >= 0                                 |   200 |   200 |   200 |     887 |           0 |
+    | Survived == 1                                 |   100 |   100 |   100 |     342 |           0 |
+    | Survived == 0                                 |   100 |   100 |   100 |     545 |           0 |
+    | Survived == 1 & Sex == 'female'               |    50 |    48 |    52 |     233 |           0 |
+    | Survived == 0 & Sex == 'female'               |    48 |    48 |    52 |      81 |           0 |
+    | Survived == 1 & Pclass == 1                   |    33 |    30 |    35 |     136 |           0 |
+    | Survived == 1 & Pclass == 2                   |    34 |    30 |    35 |      87 |           0 |
+    | Survived == 1 & Pclass == 3                   |    33 |    30 |    35 |     119 |           0 |
+    | Survived == 0 & Pclass == 1                   |    30 |    30 |    35 |      80 |           0 |
+    | Survived == 0 & Pclass == 2                   |    31 |    30 |    35 |      97 |           0 |
+    | Survived == 0 & Pclass == 3                   |    39 |    30 |    35 |     368 |           4 |
+    | Survived == 0 & Pclass == 1 & Sex == 'female' |     3 |     8 |    12 |       3 |           5 |
+    | Age < 20                                      |    49 |    48 |    52 |     199 |           0 |
+    | Age < 30 & Age >= 20                          |    50 |    48 |    52 |     293 |           0 |
+    | Age < 40 & Age >= 30                          |    51 |    48 |    52 |     199 |           0 |
+    | Age >= 40                                     |    50 |    48 |    52 |     196 |           0 |
 
 
 Goodie!  This constraing is now satisfied, and we reduced the integral gap to 0 (since the actual penalty = theoretical penalty), which means we are at the optimal solution!
@@ -891,188 +218,28 @@ What we want is to be able to bound a query relative to the (yet unknown) number
 ```python
 # Get relative fraction constraints
 df_cond_rel = pd.read_csv('csvs/curation_conditions_rel.csv').set_index('query')
-df_cond_rel.reset_index()
+print(df_cond_rel.reset_index().to_markdown())
 
 ```
 
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>query</th>
-      <th>id</th>
-      <th>min</th>
-      <th>max</th>
-      <th>index_ref</th>
-      <th>penalty_per_violation</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>Survived &gt;= 0</td>
-      <td>0</td>
-      <td>200.00</td>
-      <td>200.00</td>
-      <td>-1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>Survived == 1</td>
-      <td>1</td>
-      <td>0.45</td>
-      <td>0.55</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>Survived == 0</td>
-      <td>2</td>
-      <td>0.45</td>
-      <td>0.55</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>Survived == 1 &amp; Sex == 'female'</td>
-      <td>3</td>
-      <td>0.49</td>
-      <td>0.51</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>Survived == 0 &amp; Sex == 'female'</td>
-      <td>4</td>
-      <td>0.49</td>
-      <td>0.51</td>
-      <td>2</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>5</th>
-      <td>Survived == 1 &amp; Pclass == 1</td>
-      <td>5</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>6</th>
-      <td>Survived == 1 &amp; Pclass == 2</td>
-      <td>6</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>7</th>
-      <td>Survived == 1 &amp; Pclass == 3</td>
-      <td>7</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>1</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>8</th>
-      <td>Survived == 0 &amp; Pclass == 1</td>
-      <td>8</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>2</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>9</th>
-      <td>Survived == 0 &amp; Pclass == 2</td>
-      <td>9</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>2</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>10</th>
-      <td>Survived == 0 &amp; Pclass == 3</td>
-      <td>10</td>
-      <td>0.30</td>
-      <td>0.35</td>
-      <td>2</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>11</th>
-      <td>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</td>
-      <td>11</td>
-      <td>0.28</td>
-      <td>0.35</td>
-      <td>8</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>12</th>
-      <td>Age &lt; 20</td>
-      <td>12</td>
-      <td>0.24</td>
-      <td>0.26</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>13</th>
-      <td>Age &lt; 30 &amp; Age &gt;= 20</td>
-      <td>13</td>
-      <td>0.24</td>
-      <td>0.26</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>14</th>
-      <td>Age &lt; 40 &amp; Age &gt;= 30</td>
-      <td>14</td>
-      <td>0.24</td>
-      <td>0.26</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>15</th>
-      <td>Age &gt;= 40</td>
-      <td>15</td>
-      <td>0.24</td>
-      <td>0.26</td>
-      <td>0</td>
-      <td>1</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
+    |    | query                                         |   id |    min |    max |   index_ref |   penalty_per_violation |
+    |---:|:----------------------------------------------|-----:|-------:|-------:|------------:|------------------------:|
+    |  0 | Survived >= 0                                 |    0 | 200    | 200    |          -1 |                       1 |
+    |  1 | Survived == 1                                 |    1 |   0.45 |   0.55 |           0 |                       1 |
+    |  2 | Survived == 0                                 |    2 |   0.45 |   0.55 |           0 |                       1 |
+    |  3 | Survived == 1 & Sex == 'female'               |    3 |   0.49 |   0.51 |           1 |                       1 |
+    |  4 | Survived == 0 & Sex == 'female'               |    4 |   0.49 |   0.51 |           2 |                       1 |
+    |  5 | Survived == 1 & Pclass == 1                   |    5 |   0.3  |   0.35 |           1 |                       1 |
+    |  6 | Survived == 1 & Pclass == 2                   |    6 |   0.3  |   0.35 |           1 |                       1 |
+    |  7 | Survived == 1 & Pclass == 3                   |    7 |   0.3  |   0.35 |           1 |                       1 |
+    |  8 | Survived == 0 & Pclass == 1                   |    8 |   0.3  |   0.35 |           2 |                       1 |
+    |  9 | Survived == 0 & Pclass == 2                   |    9 |   0.3  |   0.35 |           2 |                       1 |
+    | 10 | Survived == 0 & Pclass == 3                   |   10 |   0.3  |   0.35 |           2 |                       1 |
+    | 11 | Survived == 0 & Pclass == 1 & Sex == 'female' |   11 |   0.28 |   0.35 |           8 |                       1 |
+    | 12 | Age < 20                                      |   12 |   0.24 |   0.26 |           0 |                       1 |
+    | 13 | Age < 30 & Age >= 20                          |   13 |   0.24 |   0.26 |           0 |                       1 |
+    | 14 | Age < 40 & Age >= 30                          |   14 |   0.24 |   0.26 |           0 |                       1 |
+    | 15 | Age >= 40                                     |   15 |   0.24 |   0.26 |           0 |                       1 |
 
 
 Here, *index_ref* column is referencing a previous constraint id.
@@ -1085,181 +252,28 @@ Let's run the *RelBoundariesCurator* to solve this (here with the simplex method
 ```python
 cc = curator.RelBoundariesCurator(df_samples, df_cond_rel)
 included, summary = cc.run()
-summary
+print(summary.to_markdown())
 ```
 
-    Theoretical penalty: 8.159999999999986
+    Theoretical penalty: 8.160000000000009
     Actual penalty: 10   Total violations: 10
     Included: 200
-
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>cnt</th>
-      <th>min</th>
-      <th>max</th>
-      <th>total</th>
-      <th>violation</th>
-    </tr>
-    <tr>
-      <th>query</th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>Survived &gt;= 0</th>
-      <td>200</td>
-      <td>200</td>
-      <td>200</td>
-      <td>887</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1</th>
-      <td>110</td>
-      <td>90</td>
-      <td>110</td>
-      <td>342</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0</th>
-      <td>90</td>
-      <td>90</td>
-      <td>110</td>
-      <td>545</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Sex == 'female'</th>
-      <td>56</td>
-      <td>54</td>
-      <td>56</td>
-      <td>233</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Sex == 'female'</th>
-      <td>44</td>
-      <td>44</td>
-      <td>46</td>
-      <td>81</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 1</th>
-      <td>38</td>
-      <td>33</td>
-      <td>38</td>
-      <td>136</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 2</th>
-      <td>39</td>
-      <td>33</td>
-      <td>38</td>
-      <td>87</td>
-      <td>1</td>
-    </tr>
-    <tr>
-      <th>Survived == 1 &amp; Pclass == 3</th>
-      <td>33</td>
-      <td>33</td>
-      <td>38</td>
-      <td>119</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1</th>
-      <td>27</td>
-      <td>27</td>
-      <td>31</td>
-      <td>80</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 2</th>
-      <td>28</td>
-      <td>27</td>
-      <td>31</td>
-      <td>97</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 3</th>
-      <td>35</td>
-      <td>27</td>
-      <td>31</td>
-      <td>368</td>
-      <td>4</td>
-    </tr>
-    <tr>
-      <th>Survived == 0 &amp; Pclass == 1 &amp; Sex == 'female'</th>
-      <td>3</td>
-      <td>8</td>
-      <td>9</td>
-      <td>3</td>
-      <td>5</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 20</th>
-      <td>52</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 30 &amp; Age &gt;= 20</th>
-      <td>48</td>
-      <td>48</td>
-      <td>52</td>
-      <td>293</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &lt; 40 &amp; Age &gt;= 30</th>
-      <td>52</td>
-      <td>48</td>
-      <td>52</td>
-      <td>199</td>
-      <td>0</td>
-    </tr>
-    <tr>
-      <th>Age &gt;= 40</th>
-      <td>48</td>
-      <td>48</td>
-      <td>52</td>
-      <td>196</td>
-      <td>0</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
+    | query                                         |   cnt |   min |   max |   total |   violation |
+    |:----------------------------------------------|------:|------:|------:|--------:|------------:|
+    | Survived >= 0                                 |   200 |   200 |   200 |     887 |           0 |
+    | Survived == 1                                 |   110 |    90 |   110 |     342 |           0 |
+    | Survived == 0                                 |    90 |    90 |   110 |     545 |           0 |
+    | Survived == 1 & Sex == 'female'               |    56 |    54 |    56 |     233 |           0 |
+    | Survived == 0 & Sex == 'female'               |    44 |    44 |    46 |      81 |           0 |
+    | Survived == 1 & Pclass == 1                   |    38 |    33 |    38 |     136 |           0 |
+    | Survived == 1 & Pclass == 2                   |    39 |    33 |    38 |      87 |           1 |
+    | Survived == 1 & Pclass == 3                   |    33 |    33 |    38 |     119 |           0 |
+    | Survived == 0 & Pclass == 1                   |    27 |    27 |    31 |      80 |           0 |
+    | Survived == 0 & Pclass == 2                   |    28 |    27 |    31 |      97 |           0 |
+    | Survived == 0 & Pclass == 3                   |    35 |    27 |    31 |     368 |           4 |
+    | Survived == 0 & Pclass == 1 & Sex == 'female' |     3 |     8 |     9 |       3 |           5 |
+    | Age < 20                                      |    52 |    48 |    52 |     199 |           0 |
+    | Age < 30 & Age >= 20                          |    48 |    48 |    52 |     293 |           0 |
+    | Age < 40 & Age >= 30                          |    52 |    48 |    52 |     199 |           0 |
+    | Age >= 40                                     |    48 |    48 |    52 |     196 |           0 |
 
